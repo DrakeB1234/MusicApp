@@ -37,10 +37,14 @@ svg {
   display: block;
 }
 
+a {
+  color: inherit;
+}
+
 :root {
   --palette-white: #ffffff;
-  --palette-grey-50: #f0f1f3;
-  --palette-grey-100: #e0e2e7;
+  --palette-grey-50: #f0f1f5;
+  --palette-grey-100: #e0e2eb;
   --palette-grey-200: #c1c6cf;
   --palette-grey-300: #a3a9b8;
   --palette-grey-400: #848da0;
@@ -63,7 +67,7 @@ svg {
 }
 
 :root {
-  --font-body: 'Inter', sans-serif;
+  --system-ui: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 
   --font-size-small: 0.825rem;
   --font-size-base: 1rem;
@@ -86,12 +90,17 @@ svg {
   --radius-lg: 16px;
   --radius-full: 9999px;
 
+  --color-primary-light: var(--palette-blue-400);
   --color-primary: var(--palette-blue-500);
   --color-primary-dark: var(--palette-blue-600);
   --color-on-primary: var(--palette-white);
+
   --color-background: var(--palette-grey-100);
+
   --color-surface: var(--palette-grey-50);
+  --color-surface-dark: var(--palette-grey-100);
   --color-on-surface: #282d36;
+
   --color-border: var(--palette-grey-200);
   --color-font: #14161b;
   --color-font-light: #848da0;
@@ -103,11 +112,11 @@ svg {
   --transition-color: color, background-color 0.2s var(--ease-in-sine);
 
   --max-width-1: 1200px;
-  --max-width-2: 800px;
+  --max-width-2: 1000px;
 }
 
 body {
-  font-family: var(--font-body);
+  font-family: var(--system-ui);
   background-color: var(--color-background);
 }
 
@@ -117,6 +126,32 @@ h3,
 p {
   color: inherit;
   line-height: 1.4;
+}
+
+a.reset {
+  text-decoration: none;
+}
+
+a.button-secondary {
+  text-decoration: none;
+  color: var(--color-font);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-2);
+  background-color: var(--color-surface);
+  transition: var(--transition-color);
+}
+
+a.button-secondary:hover {
+  background-color: var(--color-surface-dark);
+}
+
+a.icon {
+  text-decoration: none;
+  display: flex;
+  transition: var(--transition-color);
+  background-color: var(--color-surface);
+  border-radius: var(--radius-md);
 }
 
 /* Font Classes */
@@ -137,7 +172,6 @@ p {
 
 /* Global Classes */
 .card {
-  padding: var(--space-4);
   border: var(--border-style);
   box-shadow: var(--elevation-shadow-1);
   background-color: var(--color-surface);

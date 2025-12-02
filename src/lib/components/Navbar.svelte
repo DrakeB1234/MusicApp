@@ -1,16 +1,18 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import icon from '$lib/assets/icon.svg';
 
-	let currentLink = $state('Dashboard');
+	let currentLink = $state(page.url.pathname);
 </script>
 
 <div class="navbar">
 	<div class="logo"><img src={icon} alt="" /></div>
 	<nav>
-		<a href="/" class="link" class:active={currentLink === 'Dashboard'}>Dashboard</a>
-		<a href="/exercises" class="link" class:active={currentLink === 'Exercises'}>Exercises</a>
-		<a href="/" class="link" class:active={currentLink === 'Tools'}>Tools</a>
-		<a href="/" class="link" class:active={currentLink === 'Stats'}>Stats</a>
+		<a href="/" class="link" class:active={currentLink === '/'}>Dashboard</a>
+		<a href="/exercises" class="link" class:active={currentLink.includes('/exercises')}>Exercises</a
+		>
+		<a href="/" class="link">Tools</a>
+		<a href="/" class="link">Stats</a>
 	</nav>
 </div>
 

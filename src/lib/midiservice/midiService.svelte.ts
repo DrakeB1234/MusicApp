@@ -1,8 +1,10 @@
 // midiService.svelte.ts
 
+import { absoluteSemitoneToNote, type Note } from "$lib/helpers/notehelpers";
+
 type MidiMessage = {
   type: 'noteOn' | 'noteOff' | 'other';
-  note: number[];
+  notes: Note[];
   attackType: AttackType
 };
 
@@ -20,7 +22,7 @@ class MidiService {
 
   private inputBuffer: number[] = [];
   private bufferTimer: any = null;
-  private readonly BATCH_WINDOW_MS = 40;
+  private readonly CHORD_DETECTION_DELAY_MS = 40;
 
   private attachListeners() {
     for (const input of this.access.inputs.values()) {
@@ -42,9 +44,8 @@ class MidiService {
     if (command === 144 && velocity > 0) type = 'noteOn';
     else if (command === 128 || (command === 144 && velocity === 0)) type = 'noteOff';
 
-    const message: MidiMessage = { type, note, attackType: null };
-
     if (type !== 'noteOn') {
+      const message: MidiMessage = { type, notes: [absoluteSemitoneToNote(note)], attackType: null };
       this.subscribers.forEach(callback => callback(message));
     }
     else if (type === 'noteOn') {
@@ -61,14 +62,15 @@ class MidiService {
 
     this.bufferTimer = setTimeout(() => {
       this.finalizeAttack();
-    }, this.BATCH_WINDOW_MS);
+    }, this.CHORD_DETECTION_DELAY_MS);
   }
 
   private finalizeAttack() {
     const notes = [...this.inputBuffer].sort((a, b) => a - b);
+    const notesObj: Note[] = notes.map(e => absoluteSemitoneToNote(e));
     const type = notes.length > 1 ? 'chord' : 'single';
 
-    const message: MidiMessage = { type: "noteOn", note: notes, attackType: type };
+    const message: MidiMessage = { type: "noteOn", notes: notesObj, attackType: type };
     this.subscribers.forEach(callback => callback(message));
 
     this.inputBuffer = [];
@@ -135,4 +137,4 @@ class MidiService {
   }
 }
 
-export const midi = new MidiService();
+export const midiService = new MidiService();
