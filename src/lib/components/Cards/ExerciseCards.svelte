@@ -9,7 +9,7 @@
 <div class="card no-padding">
 	<h2 class="body-regular">Exercises</h2>
 	{#each exercisesData as data (data.id)}
-		<a href="/exercises/{data.title}" class="reset link-card-item">
+		<a href="/exercises/{data.exerciseUrl}" class="reset link-card-item">
 			<CardIconWrapper url={data.iconUrl} title={data.title} />
 			<div class="card-text">
 				<h3 class="body-regular">{data.title}</h3>

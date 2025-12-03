@@ -128,6 +128,10 @@ p {
   line-height: 1.4;
 }
 
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
 a.reset {
   text-decoration: none;
 }
@@ -146,12 +150,74 @@ a.button-secondary:hover {
   background-color: var(--color-surface-dark);
 }
 
-a.icon {
+a.button-text {
   text-decoration: none;
-  display: flex;
-  transition: var(--transition-color);
   background-color: var(--color-surface);
   border-radius: var(--radius-md);
+  padding: var(--space-2);
+  transition: var(--transition-color);
+}
+
+a.button-text:hover {
+  background-color: var(--color-surface-dark);
+}
+
+button {
+  padding: var(--space-2) var(--space-3);
+  cursor: pointer;
+  color: var(--color-font);
+  -webkit-tap-highlight-color: transparent;
+}
+
+button.primary {
+  color: var(--color-on-primary);
+  background-color: var(--color-primary);
+  border: none;
+  border-radius: var(--radius-md);
+  transition: var(--transition-color);
+}
+
+button.primary:hover {
+  background-color: var(--color-primary-dark);
+}
+
+button.secondary {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: var(--transition-color);
+}
+
+button.secondary:hover {
+  background-color: var(--color-surface-dark);
+}
+
+button.secondary.active {
+  color: var(--color-on-primary);
+  background-color: var(--color-primary);
+}
+
+button.text {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-md);
+  transition: var(--transition-color);
+  padding: var(--space-2);
+  border: none;
+}
+
+button.text:hover {
+  background-color: var(--color-surface-dark);
+}
+
+button.text.active {
+  color: var(--color-on-primary);
+  background-color: var(--color-primary);
+}
+
+.icon-container {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
 }
 
 /* Font Classes */
@@ -159,7 +225,8 @@ a.icon {
   font-weight: 400;
   font-size: var(--font-size-base);
   color: var(--color-font);
-  max-width: var(--font-width-2);
+  max-width: var(--font-width-3);
+  line-height: 1.5;
 }
 
 .body-small {
@@ -167,7 +234,15 @@ a.icon {
   font-size: var(--font-size-small);
   color: var(--color-font-light);
   line-height: 1.5;
-  max-width: var(--font-width-2);
+  max-width: var(--font-width-3);
+}
+
+.bold {
+  font-weight: 500;
+}
+
+.light-text {
+  color: var(--color-font-light);
 }
 
 /* Global Classes */
