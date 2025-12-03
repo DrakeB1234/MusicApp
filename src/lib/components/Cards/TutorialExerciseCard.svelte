@@ -1,8 +1,7 @@
 <script lang="ts">
-	import type { InputTypes, TutorialSection } from '$lib/data/exercisesData';
+	import type { TutorialSection } from '$lib/data/exercisesData';
 
-	const { tutorialEntries, inputs }: { tutorialEntries: TutorialSection[]; inputs: InputTypes[] } =
-		$props();
+	const { tutorialEntries }: { tutorialEntries: TutorialSection[] } = $props();
 </script>
 
 <div class="card">
@@ -12,7 +11,7 @@
 			<div class="tutorial-section">
 				<h3 class="body-regular bold">{entry.header}</h3>
 				{#each entry.text as text, i (i)}
-					<p class="body-regular light-text">{text}</p>
+					<p class="body-small text-light">{text}</p>
 				{/each}
 			</div>
 		{/each}
@@ -22,7 +21,9 @@
 <style>
 	.card {
 		flex: 1;
+		width: 100%;
 		padding: var(--space-4);
+		padding-bottom: var(--space-5);
 	}
 	.card > h2 {
 		margin-bottom: var(--space-4);
@@ -32,6 +33,9 @@
 		gap: var(--space-4);
 	}
 	.tutorial-section > h3 {
+		margin-bottom: var(--space-1);
+	}
+	.tutorial-section > p:not(:last-child) {
 		margin-bottom: var(--space-2);
 	}
 </style>

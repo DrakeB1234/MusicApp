@@ -17,7 +17,6 @@
 	main {
 		display: flex;
 		gap: var(--space-4);
-
 		padding: var(--space-4);
 	}
 

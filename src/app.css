@@ -71,6 +71,8 @@ a {
 
   --font-size-small: 0.825rem;
   --font-size-base: 1rem;
+  --font-size-large: 1.125rem;
+  --font-size-xlarge: 1.5rem;
 
   --font-width-1: 40ch;
   --font-width-2: 60ch;
@@ -80,10 +82,10 @@ a {
   --space-2: 0.5rem;
   --space-3: 0.75rem;
   --space-4: 1rem;
-  --space-5: 1.25rem;
-  --space-6: 1.5rem;
-  --space-7: 1.75rem;
-  --space-8: 2rem;
+  --space-5: 1.5rem;
+  --space-6: 2.25rem;
+  --space-7: 3.25rem;
+  --space-8: 4.5rem;
 
   --radius-sm: 4px;
   --radius-md: 8px;
@@ -96,23 +98,30 @@ a {
   --color-on-primary: var(--palette-white);
 
   --color-background: var(--palette-grey-100);
+  --color-background-dark: var(--palette-grey-200);
+  --color-on-background: var(--palette-grey-800);
 
   --color-surface: var(--palette-grey-50);
   --color-surface-dark: var(--palette-grey-100);
-  --color-on-surface: #282d36;
+  --color-surface-xdark: var(--palette-grey-200);
+  --color-on-surface: var(--palette-grey-800);
 
   --color-border: var(--palette-grey-200);
-  --color-font: #14161b;
-  --color-font-light: #848da0;
+
+  --color-font: var(--palette-grey-900);
+  --color-font-light: var(--palette-grey-400);
 
   --ease-in-sine: cubic-bezier(0.12, 0, 0.39, 0);
 
   --border-style: 1px solid var(--color-border);
   --elevation-shadow-1: 0 3px 6px var(--palette-grey-200);
-  --transition-color: color, background-color 0.2s var(--ease-in-sine);
+  --transition-color: background-color 0.2s var(--ease-in-sine);
 
   --max-width-1: 1200px;
   --max-width-2: 1000px;
+
+  --icon-size-1: 20;
+  --icon-size-2: 32;
 }
 
 body {
@@ -120,13 +129,7 @@ body {
   background-color: var(--color-background);
 }
 
-h1,
-h2,
-h3,
-p {
-  color: inherit;
-  line-height: 1.4;
-}
+/* LINKS */
 
 a {
   -webkit-tap-highlight-color: transparent;
@@ -161,6 +164,8 @@ a.button-text {
 a.button-text:hover {
   background-color: var(--color-surface-dark);
 }
+
+/* BUTTONS */
 
 button {
   padding: var(--space-2) var(--space-3);
@@ -214,6 +219,15 @@ button.text.active {
   background-color: var(--color-primary);
 }
 
+button.on-background {
+  color: var(--color-on-background);
+  background-color: var(--color-background);
+}
+
+button.on-background:hover {
+  background-color: var(--color-background-dark);
+}
+
 .icon-container {
   display: flex;
   align-items: center;
@@ -221,27 +235,40 @@ button.text.active {
 }
 
 /* Font Classes */
-.body-regular {
-  font-weight: 400;
+h1,
+h2,
+h3,
+p {
   font-size: var(--font-size-base);
+  font-weight: 400;
+  line-height: 1.4;
   color: var(--color-font);
   max-width: var(--font-width-3);
+}
+
+.header-large {
+  font-size: var(--font-size-xlarge);
+  line-height: 1;
+}
+
+.body-large {
+  font-size: var(--font-size-large);
+}
+
+.body-regular {
   line-height: 1.5;
 }
 
 .body-small {
-  font-weight: 400;
   font-size: var(--font-size-small);
-  color: var(--color-font-light);
   line-height: 1.5;
-  max-width: var(--font-width-3);
 }
 
 .bold {
   font-weight: 500;
 }
 
-.light-text {
+.text-light {
   color: var(--color-font-light);
 }
 
