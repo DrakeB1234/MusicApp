@@ -2,7 +2,7 @@
 
 import { absoluteSemitoneToNote, type Note } from "$lib/helpers/notehelpers";
 
-export type MidiMessage = {
+type MidiMessage = {
   type: 'noteOn' | 'noteOff' | 'other';
   notes: Note[];
   attackType: AttackType
@@ -86,7 +86,7 @@ class MidiService {
   }
 
   async init() {
-    if (this.access || this.isReady) return;
+    if (this.access) return;
 
     if (!navigator.requestMIDIAccess) {
       this.error = "Web MIDI API not supported in this browser.";
@@ -118,7 +118,7 @@ class MidiService {
     }
   }
 
-  subscribe(callback: MidiCallback): () => void {
+  subscribe(callback: MidiCallback) {
     this.subscribers.add(callback);
 
     return () => {
@@ -134,10 +134,6 @@ class MidiService {
       this.updateConnectionState();
       this.attachListeners();
     }
-  }
-
-  get subscribersCount(): number {
-    return this.subscribers.size;
   }
 }
 

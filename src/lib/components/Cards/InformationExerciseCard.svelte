@@ -5,17 +5,7 @@
 	import SettingsIcon from '../Icons/SettingsIcon.svelte';
 	import ToggleButtonGroup from '../ToggleButtonGroup.svelte';
 
-	const {
-		exerciseEntry,
-		handleStartPressed
-	}: { exerciseEntry: ExerciseDataEntry; handleStartPressed: (difficulty: string) => void } =
-		$props();
-
-	function handleInternalStartPressed() {
-		handleStartPressed(difficulty);
-	}
-
-	let difficulty = $state('easy');
+	const { exerciseEntry }: { exerciseEntry: ExerciseDataEntry } = $props();
 </script>
 
 <div class="card">
@@ -27,18 +17,12 @@
 		<CardIconWrapper url={exerciseEntry.iconUrl} title={exerciseEntry.title} />
 		<div class="information-text">
 			<h1 class="body-regular">{exerciseEntry.title}</h1>
-			<p class="body-small text-light">{exerciseEntry.description}</p>
+			<p class="body-small">{exerciseEntry.description}</p>
 		</div>
 	</div>
 	<div class="stats">
-		<div class="stat-entry">
-			<p class="body-small">Total Points</p>
-			<p class="body-large bold">4301</p>
-		</div>
-		<div class="stat-entry">
-			<p class="body-small">Attempts</p>
-			<p class="body-large bold">8</p>
-		</div>
+		<p class="body-regular">Total Points: <span class="bold">4356</span></p>
+		<p class="body-regular">Times Played: <span class="bold">8</span></p>
 	</div>
 	<div class="toggle-buttons">
 		<h2 class="body-regular bold">Difficulty</h2>
@@ -48,7 +32,17 @@
 				{ text: 'Medium', value: 'medium' },
 				{ text: 'Hard', value: 'hard' }
 			]}
-			bind:value={difficulty}
+			onChange={(e) => console.log(e)}
+		/>
+	</div>
+	<div class="toggle-buttons">
+		<h2 class="body-regular bold">Input</h2>
+		<ToggleButtonGroup
+			buttons={exerciseEntry.availableInputs.map((input) => ({
+				text: input,
+				value: input
+			}))}
+			onChange={(e) => console.log(e)}
 		/>
 	</div>
 	<div class="action-buttons">
@@ -56,16 +50,14 @@
 			<SettingsIcon />
 			Personalize
 		</button>
-		<button class="primary" onclick={handleInternalStartPressed}>Start Exercise</button>
+		<button class="primary">Start Exercise</button>
 	</div>
 </div>
 
 <style>
 	.card {
 		flex: 2;
-		width: 100%;
 		padding: var(--space-4);
-		padding-top: var(--space-2);
 	}
 	.back-link {
 		width: fit-content;
@@ -78,15 +70,8 @@
 	.stats {
 		display: flex;
 		flex-wrap: wrap;
-		gap: var(--space-2);
-		margin-block: var(--space-4);
-	}
-	.stat-entry {
-		text-align: center;
-		padding: var(--space-4);
-		background-color: var(--color-background);
-		border: 1px solid var(--color-border);
-		border-radius: var(--radius-lg);
+		gap: var(--space-4);
+		padding-block: var(--space-4);
 	}
 	.toggle-buttons {
 		padding-bottom: var(--space-4);
@@ -96,7 +81,6 @@
 	}
 	.action-buttons {
 		display: flex;
-		flex-wrap: wrap;
 		gap: var(--space-3);
 		padding-block: var(--space-4);
 	}
