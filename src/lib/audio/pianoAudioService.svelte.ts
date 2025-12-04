@@ -93,7 +93,10 @@ class PianoAudioService {
   }
 
   playNote(note: Note) {
-    if (!this.isReady || !this.sound) return;
+    if (!this.isReady || !this.sound) {
+      console.warn("Audio was requested, but pianoAudioService was never intialized.");
+      return;
+    };
 
     const strategy = this.calculateStrategy(note);
     if (!strategy) return;
@@ -107,8 +110,10 @@ class PianoAudioService {
   }
 
   playChord(notes: Note[]) {
-    if (!this.isReady || !this.sound) return;
-
+    if (!this.isReady || !this.sound) {
+      console.warn("Audio was requested, but pianoAudioService was never intialized.");
+      return;
+    };
     notes.forEach(note => {
       this.playNote(note);
     });
@@ -119,7 +124,6 @@ class PianoAudioService {
     this.isMuted = true;
   }
   unMuteSounds = () => {
-    console.log(Howler.noAudio)
     Howler.mute(false);
     this.isMuted = false;
   }

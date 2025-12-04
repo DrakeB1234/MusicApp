@@ -1,3 +1,5 @@
+import type { SightreadingClefParams } from "$lib/data/sightreadingParams";
+
 export type Note = {
   name: string,
   octave: number | null,
@@ -36,4 +38,15 @@ export function absoluteSemitoneToNote(midiNum: number): Note {
     octave: octave,
     ...note
   };
+}
+
+export function noteToString(note: Note): string {
+  let str = `${note.name}${note.accidental ?? ''}`;
+  if (note.octave) str += `/${note.octave}`;
+  if (note.duration) str += `/${note.duration}`;
+  return str;
+}
+
+export function generateNewNote(note: Note, lastNote: Note, clefParams: SightreadingClefParams) {
+
 }

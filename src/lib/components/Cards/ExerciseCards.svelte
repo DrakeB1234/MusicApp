@@ -13,7 +13,7 @@
 			<CardIconWrapper url={data.iconUrl} title={data.title} />
 			<div class="card-text">
 				<h3 class="body-regular">{data.title}</h3>
-				<p class="body-small">{data.description}</p>
+				<p class="body-small text-light">{data.description}</p>
 			</div>
 			<div class="play-container">
 				<PlayIcon />

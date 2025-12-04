@@ -1,5 +1,5 @@
 <script>
-	const { color = 'var(--color-on-surface)', size = 40 } = $props();
+	const { color = 'var(--color-on-surface)', size = 32 } = $props();
 </script>
 
 <svg
