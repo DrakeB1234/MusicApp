@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { pianoAudioService } from '$lib/audio/pianoAudioService.svelte';
 	import { onMount } from 'svelte';
-	import ExitIcon from '../Icons/ExitIcon.svelte';
-	import NoteInputButtons from '../Inputs/NoteInputButtons.svelte';
+	import ExitIcon from '$lib/components/Icons/ExitIcon.svelte';
+	import NoteInputButtons from '$lib/components/Inputs/NoteInputButtons.svelte';
 	import { SightreadingExercise } from '$lib/exerciselogic/SightReadingExercise.svelte';
 	import { midiService } from '$lib/midiservice/midiService.svelte';
 	import { sfxAudioService } from '$lib/audio/sfxAudioService.svelte';
