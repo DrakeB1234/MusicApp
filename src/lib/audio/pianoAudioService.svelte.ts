@@ -1,4 +1,4 @@
-import { NOTE_TO_INDEX, type Note } from '$lib/helpers/notehelpers';
+import { getNaturalNoteIndex, type Note } from '$lib/helpers/notehelpers';
 import { Howl, Howler } from 'howler';
 
 const SPRITE_MAP: Record<string, [number, number]> = {
@@ -59,7 +59,7 @@ class PianoAudioService {
   private calculateStrategy(note: Note) {
     if (note.octave === null) return null;
 
-    const targetIndex = NOTE_TO_INDEX[note.name.toUpperCase()];
+    const targetIndex = getNaturalNoteIndex(note.name);
     if (targetIndex === undefined) return null;
 
     if (note.octave >= 8) {

@@ -1,6 +1,6 @@
 // midiService.svelte.ts
 
-import { absoluteSemitoneToNote, type Note } from "$lib/helpers/notehelpers";
+import { midiSemitoneToNote, type Note } from "$lib/helpers/notehelpers";
 
 export type MidiMessage = {
   type: 'noteOn' | 'noteOff' | 'other';
@@ -45,7 +45,7 @@ class MidiService {
     else if (command === 128 || (command === 144 && velocity === 0)) type = 'noteOff';
 
     if (type !== 'noteOn') {
-      const message: MidiMessage = { type, notes: [absoluteSemitoneToNote(note)], attackType: null };
+      const message: MidiMessage = { type, notes: [midiSemitoneToNote(note)], attackType: null };
       this.subscribers.forEach(callback => callback(message));
     }
     else if (type === 'noteOn') {
@@ -67,7 +67,7 @@ class MidiService {
 
   private finalizeAttack() {
     const notes = [...this.inputBuffer].sort((a, b) => a - b);
-    const notesObj: Note[] = notes.map(e => absoluteSemitoneToNote(e));
+    const notesObj: Note[] = notes.map(e => midiSemitoneToNote(e));
     const type = notes.length > 1 ? 'chord' : 'single';
 
     const message: MidiMessage = { type: "noteOn", notes: notesObj, attackType: type };

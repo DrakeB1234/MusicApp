@@ -1,5 +1,3 @@
-import type { SightreadingClefParams } from "$lib/data/sightreadingParams";
-
 export type Note = {
   name: string,
   octave: number | null,
@@ -7,37 +5,50 @@ export type Note = {
   duration?: string
 }
 
-const SEMITONE_NOTE_MAP: Omit<Note, "octave" | "duration">[] = [
-  { name: "C", accidental: null },
-  { name: "C", accidental: "#" },
-  { name: "D", accidental: null },
-  { name: "D", accidental: "#" },
-  { name: "E", accidental: null },
-  { name: "F", accidental: null },
-  { name: "F", accidental: "#" },
-  { name: "G", accidental: null },
-  { name: "G", accidental: "#" },
-  { name: "A", accidental: null },
-  { name: "A", accidental: "#" },
-  { name: "B", accidental: null }
-];
+export const NATURAL_NOTE_NAMES = ["C", "D", "E", "F", "G", "A", "B"];
 export const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
-export const NOTE_TO_INDEX: Record<string, number> = {};
-NOTE_NAMES.forEach((n, i) => NOTE_TO_INDEX[n] = i);
+export function midiSemitoneToNote(semitone: number): Note {
+  // MIDI maps C4 = 60, which should be 48
+  const newSemitone = semitone - 12;
+  const newNote = absoluteSemitoneToNote(newSemitone);
+  return newNote;
+}
 
-/**
- * Converts a Semitone/MIDI number to a Note obj.
- * Example: 60 -> "C4", 61 -> "C#4"
- */
-export function absoluteSemitoneToNote(midiNum: number): Note {
-  const note = SEMITONE_NOTE_MAP[midiNum % 12];
-  const octave = Math.floor(midiNum / 12) - 1;
+export function absoluteSemitoneToNote(semitone: number): Note {
+  const note = NOTE_NAMES[semitone % 12];
+  const octave = Math.floor(semitone / 12);
+  console.log(semitone, note, octave)
+
+  let name = "";
+  let accidental = null;
+
+  if (note.includes("#")) {
+    name = note.charAt(0);
+    accidental = "#";
+  } else {
+    name = note;
+  }
 
   return {
+    name: name,
     octave: octave,
-    ...note
+    accidental: accidental
   };
+}
+
+export function getNaturalNoteIndex(noteName: string): number {
+  return NATURAL_NOTE_NAMES.findIndex(e => e === noteName);
+}
+
+export function noteToAbsoluteSemitone(note: Note): number {
+  const nameIdx = getNaturalNoteIndex(note.name);
+  const octaveNum = (note.octave ?? 0) * 12;
+  let semitones = nameIdx + octaveNum;
+
+  if (note.accidental === "#") semitones += 1;
+  else if (note.accidental === "b") semitones -= 1;
+  return semitones;
 }
 
 export function noteToString(note: Note): string {
@@ -45,8 +56,4 @@ export function noteToString(note: Note): string {
   if (note.octave) str += `/${note.octave}`;
   if (note.duration) str += `/${note.duration}`;
   return str;
-}
-
-export function generateNewNote(note: Note, lastNote: Note, clefParams: SightreadingClefParams) {
-
 }

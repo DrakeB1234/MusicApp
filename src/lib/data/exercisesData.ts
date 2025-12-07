@@ -15,7 +15,7 @@ export type TutorialSection = {
 export const exercisesData: ExerciseDataEntry[] = [
   {
     id: "a8d49c42-e11e-446e-aa96-7137debdc937",
-    exerciseUrl: "sightreading",
+    exerciseUrl: "sight-reading",
     title: "Sightreading",
     description: "Multiple notes are played simultaneously. Can you identify the chord? Click on the right answer.",
     iconUrl: "icons/SightreadingIcon.svg",
@@ -39,7 +39,7 @@ export const exercisesData: ExerciseDataEntry[] = [
   },
   {
     id: "3d30f957-c589-43f6-b3f4-b5f37c2feb21",
-    exerciseUrl: "rhythmtraining",
+    exerciseUrl: "rhythm-training",
     title: "Rhythm Training",
     description: "Multiple notes are played simultaneously. Can you identify the chord? Click on the right answer.",
     iconUrl: "icons/RhythmIcon.svg",

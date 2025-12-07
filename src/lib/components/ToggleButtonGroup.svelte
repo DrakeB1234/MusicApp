@@ -11,7 +11,7 @@
 	let { buttons, value = $bindable() }: Props = $props();
 </script>
 
-<div class="row">
+<div class="toggle-buttons-container">
 	{#each buttons as entry, i (i)}
 		<button class="text" class:active={value === entry.value} onclick={() => (value = entry.value)}
 			>{entry.text}
@@ -20,7 +20,7 @@
 </div>
 
 <style>
-	.row {
+	.toggle-buttons-container {
 		display: flex;
 		flex-wrap: wrap;
 		gap: var(--space-1);

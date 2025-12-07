@@ -7,8 +7,7 @@
 	import { midiService } from '$lib/midiservice/midiService.svelte';
 	import { sfxAudioService } from '$lib/audio/sfxAudioService.svelte';
 
-	const { handleExitPressed, difficulty }: { handleExitPressed: () => void; difficulty: any } =
-		$props();
+	const { handleExitPressed, params }: { handleExitPressed: () => void; params: any } = $props();
 
 	onMount(() => {
 		pianoAudioService.init();
@@ -16,7 +15,7 @@
 		midiService.init();
 	});
 
-	const game = new SightreadingExercise(60, difficulty);
+	const game = new SightreadingExercise(params.difficulty, params.clef);
 
 	$effect(() => {
 		const midiServiceUnsubscribe = midiService.subscribe(game.handleMidiInput);
@@ -37,7 +36,7 @@
 	<div class="card">
 		<div class="game-information">
 			<div class="information-entry">
-				<p class="body-large bold">430</p>
+				<p class="body-large bold">{game.score}</p>
 				<p class="body-regular">Score</p>
 			</div>
 			<div class="information-entry">
@@ -45,7 +44,7 @@
 				<p class="body-regular">Correct</p>
 			</div>
 			<div class="information-entry">
-				<p class="body-large bold timer">{game.timeLeftString}</p>
+				<p class="body-large bold">{game.timeLeftString}</p>
 				<p class="body-regular">Time</p>
 			</div>
 		</div>

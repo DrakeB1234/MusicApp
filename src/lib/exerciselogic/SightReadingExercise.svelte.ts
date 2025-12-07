@@ -1,19 +1,26 @@
 import { pianoAudioService } from "$lib/audio/pianoAudioService.svelte";
 import { sfxAudioService } from "$lib/audio/sfxAudioService.svelte";
-import { noteToString, type Note } from "$lib/helpers/notehelpers";
+import { absoluteSemitoneToNote, noteToAbsoluteSemitone, noteToString, type Note } from "$lib/helpers/notehelpers";
 import { type MidiMessage } from "$lib/midiservice/midiService.svelte";
 import { TimerComponent } from "./TimerComponent.svelte";
 
-type SightreadingClefParams = {
-  minOctave: Note;
-  maxOctave: Note;
+type difficulty = "easy" | "medium" | "hard";
+type clefs = "treble" | "bass" | "grand";
+
+export type ExercisePresetConfig = {
+  minNote: Note;
+  maxNote: Note;
+  timer: number;
+  allowedAccidentals: string[] | null;
 }
 
-const sightreadingParams = {
+export const exercisePresetParams: Partial<Record<difficulty, ExercisePresetConfig>> = {
   easy: {
-    minOctave: { name: "F", octave: 3, accidental: null },
-    maxOctave: { name: "C", octave: 5, accidental: null }
-  } as SightreadingClefParams
+    minNote: { name: "F", octave: 3, accidental: null },
+    maxNote: { name: "C", octave: 5, accidental: null },
+    timer: 60,
+    allowedAccidentals: ["#", "b"]
+  }
 }
 
 export class SightreadingExercise {
@@ -24,19 +31,17 @@ export class SightreadingExercise {
   private timer: TimerComponent | null;
   private correctNotesPlayed: number = 0;
   private totalNotesPlayed: number = $state(0);
-  private clefParams: SightreadingClefParams;
 
-  constructor(timeLimit: number, difficulty: string) {
+  private currentExerciseParam: ExercisePresetConfig;
+
+  constructor(difficulty: string, clef: string) {
+    let exercisePresetParam = exercisePresetParams[difficulty as difficulty];
+    if (!exercisePresetParam) exercisePresetParam = exercisePresetParams.easy;
+    this.currentExerciseParam = exercisePresetParam as ExercisePresetConfig;
+
     this.currentNote = { name: "C", octave: 4, accidental: null };
-    this.timer = new TimerComponent(timeLimit, this.handleTimeout);
+    this.timer = new TimerComponent(this.currentExerciseParam.timer, this.handleTimeout);
     this.timer.start();
-
-    if (difficulty === "easy") {
-      this.clefParams = sightreadingParams[difficulty];
-    }
-    else {
-      this.clefParams = sightreadingParams.easy;
-    }
   }
 
   handleMidiInput = (message: MidiMessage) => {
@@ -50,6 +55,7 @@ export class SightreadingExercise {
   }
 
   handleNoteInput = (note: Note) => {
+    if (this.isGameOver) return;
     const str = noteToString(note);
     this.playedNote = str;
 
@@ -70,11 +76,15 @@ export class SightreadingExercise {
   }
 
   handleCorrectNote(note: Note) {
+    if (!note.octave) note.octave = this.currentNote.octave;
+    pianoAudioService.playNote(note);
+
     this.totalNotesPlayed += 1;
     this.correctNotesPlayed += 1;
 
-    if (!note.octave) note.octave = 4;
-    pianoAudioService.playNote(note);
+    const newNote = this.generateNewNote();
+    this.currentNote = newNote;
+
   }
 
   handleIncorrectNote() {
@@ -101,5 +111,27 @@ export class SightreadingExercise {
 
   get currentNoteString(): string {
     return noteToString(this.currentNote);
+  }
+
+  generateNewNote(): Note {
+    const tempMaxSemitone = noteToAbsoluteSemitone(this.currentExerciseParam.maxNote);
+    const tempMinSemitone = noteToAbsoluteSemitone(this.currentExerciseParam.minNote);
+    const lastNoteSemitone = noteToAbsoluteSemitone(this.currentNote);
+
+    // Handle edgecase of min > max, or the inverse
+    const minSemitone = Math.min(tempMinSemitone, tempMaxSemitone);
+    const maxSemitone = Math.max(tempMinSemitone, tempMaxSemitone);
+
+    const randomSemitone = Math.floor(Math.random() * (maxSemitone - minSemitone + 1)) + minSemitone;
+    let newSemitone = randomSemitone;
+
+    if (newSemitone === lastNoteSemitone) {
+      newSemitone += 4;
+      if (newSemitone > maxSemitone) {
+        newSemitone = minSemitone + 4;
+      }
+    }
+
+    return absoluteSemitoneToNote(newSemitone);
   }
 }
