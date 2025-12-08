@@ -1,7 +1,10 @@
 <script lang="ts">
-	import type { Note } from '$lib/helpers/notehelpers';
+	import { NATURAL_NOTE_NAMES, type Note } from '$lib/helpers/notehelpers';
 
-	const { handleNotePressed }: { handleNotePressed: (note: Note) => void } = $props();
+	let {
+		handleNotePressed,
+		incorrectNote
+	}: { handleNotePressed: (note: Note) => void; incorrectNote?: Note | null } = $props();
 
 	const ActiveAccidental = Object.freeze({
 		SHARP: '#',
@@ -23,6 +26,15 @@
 		};
 		handleNotePressed(note);
 	}
+
+	$effect(() => {
+		if (incorrectNote) {
+			const timer = setTimeout(() => {
+				incorrectNote = null;
+			}, 500);
+			return () => clearTimeout(timer);
+		}
+	});
 </script>
 
 <div class="input-buttons-wrapper">
@@ -39,13 +51,13 @@
 		>
 	</div>
 	<div class="note-buttons">
-		<button class="secondary" onclick={() => handleNoteNamePressed('C')}>C</button>
-		<button class="secondary" onclick={() => handleNoteNamePressed('D')}>D</button>
-		<button class="secondary" onclick={() => handleNoteNamePressed('E')}>E</button>
-		<button class="secondary" onclick={() => handleNoteNamePressed('F')}>F</button>
-		<button class="secondary" onclick={() => handleNoteNamePressed('G')}>G</button>
-		<button class="secondary" onclick={() => handleNoteNamePressed('A')}>A</button>
-		<button class="secondary" onclick={() => handleNoteNamePressed('B')}>B</button>
+		{#each NATURAL_NOTE_NAMES as name}
+			<button
+				class="secondary"
+				onclick={() => handleNoteNamePressed(name)}
+				class:incorrect={incorrectNote?.name === name}>{name}</button
+			>
+		{/each}
 	</div>
 </div>
 
@@ -61,5 +73,10 @@
 		flex-wrap: wrap;
 		gap: var(--space-2);
 		justify-content: center;
+		transition: var(--transition-color);
+	}
+	.incorrect {
+		color: var(--color-on-error);
+		background-color: var(--color-error) !important;
 	}
 </style>

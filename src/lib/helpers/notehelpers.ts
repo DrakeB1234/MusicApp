@@ -52,8 +52,8 @@ export function noteToAbsoluteSemitone(note: Note): number {
   const nameOffset = NATURAL_NOTE_SEMITONE_OFFSETS[note.name.toUpperCase()];
   const octaveOffset = (note.octave ?? 0) * 12;
   let accidentalOffset = 0;
-  if (note.accidental === "#") accidentalOffset += 1;
-  if (note.accidental === "b") accidentalOffset -= 1;
+  if (note.accidental === "#") accidentalOffset = 1;
+  if (note.accidental === "b") accidentalOffset = -1;
 
   return nameOffset + octaveOffset + accidentalOffset;
 }

@@ -61,15 +61,18 @@
 				<p class="body-regular">Correct</p>
 			</div>
 			<div class="information-entry">
-				<p class="body-large bold">{game.timeLeftString}</p>
-				<p class="body-regular">Time</p>
+				<p class="body-large bold">{game.triesLeftString}</p>
+				<p class="body-regular">Tries</p>
 			</div>
 		</div>
 		<div class="game-viewport">
 			<div bind:this={staffContainer} class="staff-container"></div>
 		</div>
 		<div class="game-inputs">
-			<NoteInputButtons handleNotePressed={game.handleNoteInput} />
+			<NoteInputButtons
+				handleNotePressed={game.handleNoteInput}
+				incorrectNote={game.incorrectNote}
+			/>
 		</div>
 	</div>
 </main>
@@ -89,6 +92,7 @@
 		text-align: end;
 	}
 	.game-viewport {
+		padding-block: var(--space-4);
 		background-color: var(--color-background);
 		border-bottom: 1px solid var(--color-border);
 	}

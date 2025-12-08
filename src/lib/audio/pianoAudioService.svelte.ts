@@ -96,6 +96,8 @@ class PianoAudioService {
       return;
     };
 
+    if (!note.octave || note.octave < 0) return;
+
     const strategy = this.calculateStrategy(note);
     if (!strategy) return;
 
