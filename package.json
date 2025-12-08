@@ -37,6 +37,7 @@
 		"cookie": "^0.7.0"
 	},
 	"dependencies": {
-		"howler": "^2.2.4"
+		"howler": "^2.2.4",
+		"sola-score": "file:src/lib/sola-score"
 	}
 }

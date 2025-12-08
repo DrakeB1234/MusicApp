@@ -2,16 +2,22 @@ import { pianoAudioService } from "$lib/audio/pianoAudioService.svelte";
 import { sfxAudioService } from "$lib/audio/sfxAudioService.svelte";
 import { absoluteSemitoneToNote, noteToAbsoluteSemitone, noteToString, type Note } from "$lib/helpers/notehelpers";
 import { type MidiMessage } from "$lib/midiservice/midiService.svelte";
+import type { SingleStaffRenderer } from "$lib/sola-score";
 import { TimerComponent } from "./TimerComponent.svelte";
 
 type difficulty = "easy" | "medium" | "hard";
-type clefs = "treble" | "bass" | "grand";
+
+export type ExerciseParams = {
+  difficulty: string;
+  clef: string;
+};
 
 export type ExercisePresetConfig = {
   minNote: Note;
   maxNote: Note;
   timer: number;
   allowedAccidentals: string[] | null;
+  accidentalChance: number | null;
 }
 
 export const exercisePresetParams: Partial<Record<difficulty, ExercisePresetConfig>> = {
@@ -19,29 +25,76 @@ export const exercisePresetParams: Partial<Record<difficulty, ExercisePresetConf
     minNote: { name: "F", octave: 3, accidental: null },
     maxNote: { name: "C", octave: 5, accidental: null },
     timer: 60,
-    allowedAccidentals: ["#", "b"]
-  }
+    allowedAccidentals: null,
+    accidentalChance: null
+  },
+  medium: {
+    minNote: { name: "C", octave: 3, accidental: null },
+    maxNote: { name: "G", octave: 5, accidental: null },
+    timer: 60,
+    allowedAccidentals: ["#"],
+    accidentalChance: 0.20
+  },
+  hard: {
+    minNote: { name: "F", octave: 2, accidental: null },
+    maxNote: { name: "C", octave: 6, accidental: null },
+    timer: 60,
+    allowedAccidentals: ["#", "b"],
+    accidentalChance: 0.20
+  },
 }
 
 export class SightreadingExercise {
   score = $state(0);
   playedNote: string = $state("");
   private isGameOver = $state(false);
-  private currentNote: Note;
+  private currentNote: Note = { name: "C", octave: 4, accidental: null };
   private timer: TimerComponent | null;
   private correctNotesPlayed: number = 0;
   private totalNotesPlayed: number = $state(0);
+  private staffRenderer: SingleStaffRenderer | null = null;
 
+  private minSemitone: number;
+  private maxSemitone: number;
+
+  private staffClefType: string;
   private currentExerciseParam: ExercisePresetConfig;
 
   constructor(difficulty: string, clef: string) {
     let exercisePresetParam = exercisePresetParams[difficulty as difficulty];
     if (!exercisePresetParam) exercisePresetParam = exercisePresetParams.easy;
     this.currentExerciseParam = exercisePresetParam as ExercisePresetConfig;
+    this.staffClefType = clef;
 
-    this.currentNote = { name: "C", octave: 4, accidental: null };
+    this.minSemitone = noteToAbsoluteSemitone(this.currentExerciseParam.minNote);
+    this.maxSemitone = noteToAbsoluteSemitone(this.currentExerciseParam.maxNote);
+
+    this.currentNote = this.generateNewNote();
     this.timer = new TimerComponent(this.currentExerciseParam.timer, this.handleTimeout);
     this.timer.start();
+  }
+
+  private handleDrawNoteOnStaff(note: Note) {
+    if (!this.staffRenderer) return;
+    this.staffRenderer.clearAllNotes();
+
+    let staffIndex = 0;
+    if (this.staffClefType === "grand") {
+      if (noteToAbsoluteSemitone(note) < 48) {
+        staffIndex = 1;
+      }
+    }
+
+    this.staffRenderer.createNoteOnStaff({
+      note: { name: note.name, octave: note.octave!, accidental: note.accidental },
+      staffGroupIndex: staffIndex
+    });
+  }
+
+  setRenderer(renderer: SingleStaffRenderer) {
+    if (this.staffRenderer) return;
+    this.staffRenderer = renderer;
+    this.handleDrawNoteOnStaff(this.currentNote);
   }
 
   handleMidiInput = (message: MidiMessage) => {
@@ -58,16 +111,14 @@ export class SightreadingExercise {
     if (this.isGameOver) return;
     const str = noteToString(note);
     this.playedNote = str;
+    const tempCurrentNote = { ...this.currentNote };
 
-    // If no octave, don't consider it for correct note checking
     if (!note.octave) {
-      if (note.name === this.currentNote.name && note.accidental === this.currentNote.accidental) this.handleCorrectNote(note);
-      else this.handleIncorrectNote();
+      tempCurrentNote.octave = null;
     }
-    else {
-      if (note.name === this.currentNote.name && note.accidental === this.currentNote.accidental && note.octave === this.currentNote.octave) this.handleCorrectNote(note);
-      else this.handleIncorrectNote();
-    }
+
+    if (noteToAbsoluteSemitone(note) === noteToAbsoluteSemitone(tempCurrentNote)) this.handleCorrectNote(note);
+    else this.handleIncorrectNote();
   }
 
   handleTimeout = () => {
@@ -97,6 +148,7 @@ export class SightreadingExercise {
     if (!this.timer) return;
     this.timer.stop();
     this.timer = null;
+    this.staffRenderer = null;
   }
 
   get timeLeftString(): string {
@@ -114,24 +166,29 @@ export class SightreadingExercise {
   }
 
   generateNewNote(): Note {
-    const tempMaxSemitone = noteToAbsoluteSemitone(this.currentExerciseParam.maxNote);
-    const tempMinSemitone = noteToAbsoluteSemitone(this.currentExerciseParam.minNote);
     const lastNoteSemitone = noteToAbsoluteSemitone(this.currentNote);
 
-    // Handle edgecase of min > max, or the inverse
-    const minSemitone = Math.min(tempMinSemitone, tempMaxSemitone);
-    const maxSemitone = Math.max(tempMinSemitone, tempMaxSemitone);
-
-    const randomSemitone = Math.floor(Math.random() * (maxSemitone - minSemitone + 1)) + minSemitone;
+    const randomSemitone = Math.floor(Math.random() * (this.maxSemitone - this.minSemitone + 1)) + this.minSemitone;
     let newSemitone = randomSemitone;
 
-    if (newSemitone === lastNoteSemitone) {
+    if (randomSemitone === lastNoteSemitone) {
       newSemitone += 4;
-      if (newSemitone > maxSemitone) {
-        newSemitone = minSemitone + 4;
-      }
+      if (newSemitone > this.maxSemitone) newSemitone = this.minSemitone + newSemitone - this.maxSemitone;
     }
 
-    return absoluteSemitoneToNote(newSemitone);
+    let note = absoluteSemitoneToNote(newSemitone);
+    note.accidental = null;
+
+    if (this.currentExerciseParam.accidentalChance && Math.random() < this.currentExerciseParam.accidentalChance) {
+      if (this.currentExerciseParam.allowedAccidentals) {
+        const randomAccidentalIdx = Math.floor(Math.random() * this.currentExerciseParam.allowedAccidentals.length);
+        const newAccidental = this.currentExerciseParam.allowedAccidentals[randomAccidentalIdx];
+        note.accidental = newAccidental;
+      };
+    };
+
+    this.handleDrawNoteOnStaff(note);
+
+    return note;
   }
 }

@@ -1,5 +1,23 @@
-import { getNaturalNoteIndex, type Note } from '$lib/helpers/notehelpers';
+import { getNaturalNoteIndex, noteToAbsoluteSemitone, type Note } from '$lib/helpers/notehelpers';
 import { Howl, Howler } from 'howler';
+
+const SPRITE_MAP_ANCHOR_POINTS = [
+  { name: 'C1', val: 12 },
+  { name: 'G1', val: 19 },
+  { name: 'C2', val: 24 },
+  { name: 'G2', val: 31 },
+  { name: 'C3', val: 36 },
+  { name: 'G3', val: 43 },
+  { name: 'C4', val: 48 },
+  { name: 'G4', val: 55 },
+  { name: 'C5', val: 60 },
+  { name: 'G5', val: 67 },
+  { name: 'C6', val: 72 },
+  { name: 'G6', val: 79 },
+  { name: 'C7', val: 84 },
+  { name: 'G7', val: 91 },
+  { name: 'C8', val: 96 }
+];
 
 const SPRITE_MAP: Record<string, [number, number]> = {
   // [Start Time (ms), Duration (ms)]
@@ -57,41 +75,21 @@ class PianoAudioService {
    * based on which is closer to minimize stretching.
    */
   private calculateStrategy(note: Note) {
-    if (note.octave === null) return null;
+    const targetSemitone = noteToAbsoluteSemitone(note);
 
-    const targetIndex = getNaturalNoteIndex(note.name);
-    if (targetIndex === undefined) return null;
+    const bestAnchor = SPRITE_MAP_ANCHOR_POINTS.reduce((prev, curr) => {
+      return (Math.abs(curr.val - targetSemitone) < Math.abs(prev.val - targetSemitone)
+        ? curr
+        : prev);
+    });
 
-    if (note.octave >= 8) {
-      return { sampleName: 'C8', semitoneShift: targetIndex };
-    }
+    const semitoneShift = targetSemitone - bestAnchor.val;
 
-    const distToC = Math.abs(targetIndex - 0);
-    const distToG = Math.abs(targetIndex - 7);
-    const distToNextC = Math.abs(targetIndex - 12);
-
-    let sampleName = "";
-    let semitoneShift = 0;
-
-    if (distToNextC < distToG) {
-      sampleName = `C${note.octave + 1}`;
-      semitoneShift = targetIndex - 12;
-    }
-    else if (distToG < distToC) {
-      sampleName = `G${note.octave}`;
-      semitoneShift = targetIndex - 7;
-    }
-    else {
-      sampleName = `C${note.octave}`;
-      semitoneShift = targetIndex - 0;
-    }
-
-    if (note.accidental === "#") semitoneShift += 1;
-    else if (note.accidental === "b") semitoneShift -= 1;
-
-    return { sampleName, semitoneShift };
+    return {
+      sampleName: bestAnchor.name,
+      semitoneShift
+    };
   }
-
   playNote(note: Note) {
     if (!this.isReady || !this.sound) {
       console.warn("Audio was requested, but pianoAudioService was never intialized.");

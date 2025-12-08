@@ -1,0 +1,314 @@
+const E = "SoLa";
+const S = {
+  treble: {
+    clefHeightPadding: 12,
+    groupYOffset: 8,
+    clefNoteReference: { name: "F", octave: 5, accidental: null }
+  },
+  bass: {
+    clefHeightPadding: 0,
+    groupYOffset: 0.5,
+    clefNoteReference: { name: "A", octave: 3, accidental: null }
+  }
+}, d = ["C", "D", "E", "F", "G", "A", "B"], i = {
+  trebleClef: "m56 101.8 3.8 21.6c.4 2.7.4 2.7 4.3 2.7A35 35 0 0 1 100 162c0 16.8-10 29.5-25 35.5-2.1.9-2.3.7-2 2.5 1.7 9.2 4.3 23.4 4.3 31.9 0 25.3-19.3 29.8-29.3 29.8-22.5 0-28.3-14.6-28.3-24.3 0-9.2 6-17.1 16-17.1 9 0 14.2 7 14.2 15.2 0 8.6-5.3 12.6-10 14-3.4 1-4.7 1.5-4.7 2.5 0 2 3.8 4.3 11.9 4.3 8.8 0 23.7-2.6 23.7-24.7 0-7-2.2-20-4-30-.3-1.7-.6-1.6-2.3-1.3-3 .6-6.8.9-10.3.9-36.5 0-54.2-24.6-54.2-50.5 0-30.1 22.8-51.4 44.3-69.2 1.8-1.5 1.6-1.8 1.3-3.6-1-6-2-15.8-2-24.4C43.5 38 47 19.4 58 7.2 61 3.9 65.6 0 67.7 0c1.6 0 5.5 4.2 7.8 7.5a64 64 0 0 1 9.6 34.7C85.2 65 73 83.9 57 99c-.9.9-1.2 1-.9 2.8ZM70 23c-9 0-19.8 14.3-19.8 37.6 0 4.7.3 9.8 1 13.7.2 1.9.8 2 1.9 1.2C64.8 65.3 79 51.9 79 35.3c0-8.2-4-12.2-9-12.2ZM53.8 124.6l-3.1-19c-.3-1.7-.6-1.9-2.1-.7-7 5.7-13.9 11.2-22.8 21.2a48.6 48.6 0 0 0-13.9 34.6c0 20.7 16.9 35.1 43 35.1 3 0 5.9-.3 8.3-.7 2.2-.5 2.4-.5 2-2.1l-7.4-44.4c-.3-1.7-.6-1.8-3-1.2-9 2.5-14.9 9-14.9 17.4 0 6.9 4.5 13.3 10.8 16 1 .4 2.2.9 2.2 2 0 .8-.6 1.6-1.8 1.6-1 0-2.8-.5-4-1C37 180 30 170.5 30 157.2a31 31 0 0 1 21.6-29c2.6-.8 2.6-.7 2.2-3.5Zm10.3 23.7 7.3 42.5c.3 1.7.6 1.7 2.4.9a23.8 23.8 0 0 0-8-45.5c-1.9-.1-2 .3-1.7 2Z",
+  bassClef: "M37.3 0c25.1 0 40.5 17.6 40.5 44 0 46-37.7 73-73.4 91.2a6 6 0 0 1-2.5.8c-1.3 0-1.9-1-1.9-1.8 0-1.2.9-2 2.2-2.7C36 111.3 56 87.6 56 45.3c0-23.8-6.7-39.5-22-39.5-14.8 0-23.6 11-23.6 17 0 1.6.5 2.8 2.4 2.8s3.3-1 7.2-1c7.1 0 14 6 14 15.7 0 9.4-6.3 16.1-15.4 16.1C6.8 56.4.7 45.9.7 33.8A34.6 34.6 0 0 1 37.3 0ZM92 12.4a8 8 0 0 1 8 8.4 8 8 0 0 1-8 8.3 8 8 0 0 1-8-8.3 8 8 0 0 1 8-8.4Zm.2 38c4.5 0 7.8 3.6 7.8 8.3 0 4.7-3.3 8.2-7.8 8.2s-7.9-3.5-7.9-8.2c0-4.7 3.4-8.2 7.9-8.2Z",
+  flat: "M1.3 67.4C.4 66.4 0 3.1 0 3.1.1 1.1 1.9 0 3.4 0c1.1 0 2.1.7 2.1 1.9L4.8 33A2 2 0 0 0 6 35l.5.1c.6 0 1.8-1 2.5-1.5a13 13 0 0 1 6-2c5.1.4 10 4.4 10 10.7 0 5.1-3.4 11.9-13.3 18.7C9 63 6.3 66 3 67.8c0 0-.3.2-.7.2-.3 0-.6-.1-1-.6Zm3.9-9.8c0 .5.2 1.7 1.2 1.7.3 0 .7-.2 1.1-.4 4.8-3 9.9-9 9.9-15 0-2.7-1.4-6.4-4.6-6.4-2.5 0-7 3.3-7.7 5.5a280.7 280.7 0 0 0 .1 14.6Z",
+  sharp: "m1.2 46.7 2.6-1c.8-.3 1.3-2.2 1.3-2.9v-9.3c0-1.2-.7-1.8-1.3-1.8l-2.6 1H.7c-.4 0-.7-.2-.7-.7v-7.1a2 2 0 0 1 1.2-1.7L4 22c.7-.3 1.1-1.5 1.1-2.3V5.5c0-.6.6-1 1.7-1 .7 0 1.3.4 1.3 1v12.6c0 .6.5 1.8 1.4 1.8l.2-.1h.1l6.2-2.6c.5-.2 1-.9 1-2.2V1.1c0-.6.7-1.1 1.7-1.1.7 0 1.3.5 1.3 1.1v12.3c0 .5.5 1.6 1.2 1.6h.3l2.4-1h.2c.6 0 .9.2.9.8V22c0 .6-.5 1.4-1.2 1.6 0 0-2.1.9-2.7 1C20.5 25 20 26 20 27v10c0 .7.6 1.7 1.4 1.7.9-.5 2.4-1 2.5-1l.2-.2c.6 0 .9.3.9 1v7c0 .6-.5 1.4-1.2 1.6l-2.6 1.1c-.6.3-1.2 1.3-1.2 2.7v13.6c0 .6-.6 1-1.6 1-.7 0-1.4-.4-1.4-1v-12c0-.9-.3-2-1.2-2-1.7.3-5.2 1.7-6.4 2.5-.9.6-1.2 1.9-1.3 2.9v13c0 .6-.6 1.1-1.6 1.1-.8 0-1.4-.5-1.4-1.1V56.7c0-.8-.7-1.3-1.4-1.3-.5 0-2.5.9-2.5.9H.7c-.4 0-.7-.2-.7-.7v-7.2a2 2 0 0 1 1.2-1.7Zm7-16.3a42.2 42.2 0 0 0 0 12.1c.1.4.7.6 1.4.6 2.5 0 7.2-2 7.4-3.8A59.2 59.2 0 0 0 17 27c-.1-.3-.6-.5-1.2-.5-2.3 0-7 2-7.7 4Z",
+  natural: "m17.4 19.7 1.8-.6.5-.1c.5 0 1 .3 1 1v61.7c0 1-.8 1.5-1.5 1.5h-1.6c-.9 0-1.5-.6-1.5-1.5V63.4c0-1-.8-1.3-2-1.3-3.6 0-10.5 3-12.3 3.6 0 .2-.3.2-.4.2H1c-.6.1-1-.2-1-.9V1.5C0 .6.6 0 1.5 0H3c.7 0 1.5.6 1.5 1.5V22c0 .5.4.7 1.2.7 3.2 0 11-2.9 11-2.9l.6-.1ZM4.6 37.2v12.7c0 .5.6.7 1.4.7 3.1 0 10.1-2.8 10.1-5V32.9c0-.5-.3-.6-1-.6-3 0-10.5 3.2-10.5 4.9Z",
+  wholeNote: "M32.7 38C18 38 0 30 0 19.2 0 8.6 8.3 0 34.3 0 57.9 0 67 9 67 19.2 67 29.5 53.9 38 32.7 38Zm4-3.5c7.5 0 13.2-2 13.2-9.7C50 15 40 3.5 29.3 3.5c-7.1 0-12 3-12 10.7 0 9.2 8.7 20.3 19.5 20.3Z",
+  upHalfNote: "M14.5 133.3c-8.2 0-14.5-4.6-14.5-12.6 0-7.8 7-25.4 29.3-25.4a16 16 0 0 1 10.8 3.6V0H44v108c0 5.1-5 25.3-29.5 25.3ZM33 101.6c-7 0-28.6 12-28.6 19.4 0 3.6 3.3 6.4 6.8 6.4 3.3 0 7.9-1.6 14.6-6.2 10.5-6.9 13.6-10.6 13.6-13.6 0-3.4-3.1-6-6.4-6Z",
+  downHalfNote: "M29.5 0C37.7 0 44 4.6 44 12.6 44 20.4 37 38 14.7 38c-4.5 0-8.2-1.4-10.8-3.6v98.9H0v-108C0 20.2 5 0 29.5 0ZM11 31.7c7 0 28.6-12 28.6-19.4 0-3.7-3.3-6.4-6.8-6.4-3.3 0-7.9 1.6-14.6 6.1C7.7 19 4.6 22.6 4.6 25.7c0 3.4 3.1 6 6.4 6Z",
+  upQuarterNote: "M40 99V0h4v108.1c0 12.7-16.3 25.2-29.6 25.2-8 0-14.4-4.7-14.4-12.6 0-13 13.1-25.2 29.4-25.2 4.4 0 8.1 1.2 10.6 3.5Z",
+  downQuarterNote: "M4 34.3v99H0V25.2C0 12.4 16.3 0 29.6 0 37.6 0 44 4.7 44 12.6c0 13-13.1 25.1-29.4 25.1-4.4 0-8.1-1.2-10.6-3.4Z"
+}, h = {
+  trebleClef: {
+    path: i.trebleClef,
+    yOffset: -8,
+    xOffset: 2
+  },
+  bassClef: {
+    path: i.bassClef,
+    xOffset: 2
+  },
+  wholeNote: {
+    path: i.wholeNote,
+    yOffset: -4
+  },
+  upHalfNote: {
+    path: i.upHalfNote,
+    yOffset: -23
+  },
+  downHalfNote: {
+    path: i.downHalfNote,
+    yOffset: -4
+  },
+  upQuarterNote: {
+    path: i.upQuarterNote,
+    yOffset: -23
+  },
+  downQuarterNote: {
+    path: i.downQuarterNote,
+    yOffset: -4
+  },
+  flat: {
+    path: i.flat,
+    yOffset: -9,
+    xOffset: -6
+  },
+  sharp: {
+    path: i.sharp,
+    yOffset: -7,
+    xOffset: -6
+  },
+  natural: {
+    path: i.natural,
+    yOffset: -8,
+    xOffset: -6
+  }
+};
+function T(o) {
+  return (o.octave ?? 0) * 7 + d.indexOf(o.name.toLocaleUpperCase());
+}
+function _(o) {
+  let t = d.findIndex((s) => s === o.name) + 1, e = o.octave;
+  return t > d.length - 1 && (e += 1, t = 0), {
+    name: d[t],
+    octave: e,
+    accidental: o.accidental,
+    duration: o.duration
+  };
+}
+function G(o) {
+  let t = d.findIndex((s) => s === o.name) - 1, e = o.octave;
+  return t < 0 && (e -= 1, t = d.length - 1), {
+    name: d[t],
+    octave: e,
+    accidental: o.accidental,
+    duration: o.duration
+  };
+}
+class w {
+  ctx;
+  width;
+  staffGroupParent;
+  staffElements = [];
+  // Width param refers to INTERNAL staff coords system, which includes length of staff lines.
+  constructor(t, e) {
+    const {
+      staffType: s = "treble",
+      width: a = 300,
+      spacesAbove: r = 0,
+      spacesBelow: n = 0
+    } = e || {};
+    this.ctx = t, this.width = a;
+    const l = this.ctx.createGroup("staff-group", this.ctx.element);
+    this.staffGroupParent = l;
+    let c;
+    s === "grand" ? c = this.handleCreateGrandStaff() : c = this.handleCreateSingleStaff(s), this.setStaffHeight(c, a, r, n);
+  }
+  // Applies height + offset to accomodate extra spacing above the staff to show notes that would otherwise
+  // overflow
+  setStaffHeight(t, e, s, a) {
+    const r = s * 4, n = a * (8 / 2), l = r + n + t.height, c = r + t.yOffset;
+    this.staffGroupParent.setAttribute("transform", `translate(0, ${c})`), this.ctx.resize(e, l);
+  }
+  handleCreateGrandStaff() {
+    const t = this.drawStaff("treble", 0), s = this.drawStaff("bass", 72), a = this.ctx.createGroup("note-container", t), r = this.ctx.createGroup("note-container", s);
+    let n = S.treble?.groupYOffset ?? 0, l = 104 + n + 1 / 2;
+    return this.staffElements.push({
+      staffElement: t,
+      notes: [],
+      noteGroupElement: a,
+      cursorX: 34,
+      clefParams: S.treble
+    }), this.staffElements.push({
+      staffElement: s,
+      notes: [],
+      noteGroupElement: r,
+      cursorX: 34,
+      clefParams: S.bass
+    }), {
+      height: l,
+      yOffset: n
+    };
+  }
+  handleCreateSingleStaff(t) {
+    const e = this.drawStaff(t, 0), s = this.ctx.createGroup("note-container", e);
+    let a = S[t], r = a?.groupYOffset ?? 0, n = 32 + r + 1 / 2 + a?.clefHeightPadding;
+    return this.staffElements.push({
+      staffElement: e,
+      notes: [],
+      noteGroupElement: s,
+      cursorX: 34,
+      clefParams: a
+    }), {
+      height: n,
+      yOffset: r
+    };
+  }
+  // Method for selecting elements that are not recursize, applies the namespace to the query
+  namespaceScopedQuerySelector(t, e) {
+    const s = e.querySelectorAll(`:scope > .${E}-${t}`);
+    return Array.from(s);
+  }
+  drawStaffClef(t, e) {
+    const s = h[`${t}Clef`], a = this.ctx.createGroup("clef", e);
+    this.drawGlyph(s, 0, 0, a);
+  }
+  // Draws the horizontal lines on the staff, and the end lines on the staff
+  drawStaffLines(t) {
+    let s = {
+      parent: this.ctx.createGroup("staff-lines", t),
+      strokeWidth: 1
+    }, a = 0;
+    for (let r = 0; r < 5; r++)
+      this.ctx.line(0, a, this.width, a, s), a += 8;
+    s.strokeWidth = 3, this.ctx.line(0, 0, 0, 32, s), this.ctx.line(this.width, 0, this.width, 32, s);
+  }
+  drawStaff(t, e = 0) {
+    const s = this.ctx.createGroup(`${t}-staff`, this.staffGroupParent);
+    return e && (s.setAttribute("transform", `translate(0, ${e})`), this.drawGrandStaffConnectors()), this.drawStaffLines(s), this.drawStaffClef(t, s), s;
+  }
+  drawGrandStaffConnectors() {
+    const t = {
+      parent: this.staffGroupParent,
+      strokeWidth: 3,
+      className: "grand-staff-connector"
+    }, e = 32, s = e + 40;
+    this.ctx.line(0, e, 0, s, t), this.ctx.line(this.width, e, this.width, s, t);
+  }
+  getStaffElementByIndex(t) {
+    return t >= this.staffElements.length ? this.staffElements.length > 0 ? this.staffElements[0] : null : this.staffElements[t];
+  }
+  applyTranslateToNoteGroup(t, e, s) {
+    t.setAttribute("transform", `translate(${e}, ${s})`);
+  }
+  drawGlyph(t, e, s, a = this.staffGroupParent) {
+    this.ctx.path(t.path, {
+      parent: a,
+      translateX: e + (t.xOffset ?? 0),
+      translateY: s + (t.yOffset ?? 0),
+      scale: 0.2
+    });
+  }
+  getNoteSpacingYByReferenceNote(t, e) {
+    return (T(e) - T(t)) * 8 / 2;
+  }
+  drawNote(t, e, s = !1) {
+    switch (t.duration) {
+      case "h":
+        s ? this.drawGlyph(h.downHalfNote, 0, 0, e) : this.drawGlyph(h.upHalfNote, 0, 0, e);
+        break;
+      case "q":
+        s ? this.drawGlyph(h.downQuarterNote, 0, 0, e) : this.drawGlyph(h.upQuarterNote, 0, 0, e);
+        break;
+      default:
+        this.drawGlyph(h.wholeNote, 0, 0, e);
+        break;
+    }
+  }
+  drawNoteAccidental(t, e) {
+    t === "#" ? this.drawGlyph(h.sharp, 0, 0, e) : t === "b" ? this.drawGlyph(h.flat, 0, 0, e) : t === "n" && this.drawGlyph(h.natural, 0, 0, e);
+  }
+  drawNoteLedgerLines(t, e, s) {
+    if (t === 0) return;
+    this.namespaceScopedQuerySelector("ledger-line", s).forEach((A) => A.remove());
+    const r = {
+      parent: s,
+      className: "ledger-line",
+      strokeWidth: 1
+    };
+    let n = 0;
+    e === "w" || e === null ? n = 13 : n = 8.5;
+    const l = -2, c = n + 2, u = -t, f = -t + 32;
+    let p = u - 8;
+    for (; p > -1; )
+      this.ctx.line(l, p, c, p, r), p -= 8;
+    let N = f + 8;
+    for (; N < 1; )
+      this.ctx.line(l, N, c, N, r), N += 8;
+  }
+  drawNoteHandler(t, e = 0, s = !1) {
+    const a = this.getStaffElementByIndex(e);
+    if (!a) return;
+    const r = this.ctx.createGroup("note-wrapper", a.noteGroupElement), n = this.getNoteSpacingYByReferenceNote(t, a.clefParams.clefNoteReference);
+    this.applyTranslateToNoteGroup(r, a.cursorX, n), this.drawNote(t, r, s), t.accidental && this.drawNoteAccidental(t.accidental, r), this.drawNoteLedgerLines(n, t.duration ?? "w", r), a.cursorX += 24, a.notes.push({
+      element: r,
+      xPos: a.cursorX,
+      yPos: n,
+      note: t
+    });
+  }
+  createNotesOnStaff(t) {
+    t.forEach((e) => {
+      this.drawNoteHandler(e.note, e.staffGroupIndex, e.flipNote);
+    });
+  }
+  createNoteOnStaff(t) {
+    this.drawNoteHandler(t.note, t.staffGroupIndex, t.flipNote);
+  }
+  clearAllNotes() {
+    this.staffElements.forEach((e) => {
+      e.notes.forEach((s) => s.element.remove()), e.cursorX = 34, e.notes = [];
+    });
+  }
+  justifyNotes() {
+    this.staffElements.forEach((t) => {
+      const e = t.notes;
+      if (e.length === 0) return;
+      const s = this.width / (e.length + 1);
+      let a = 0;
+      e.forEach((r) => {
+        a += s, this.applyTranslateToNoteGroup(r.element, a, r.yPos), r.xPos = a;
+      });
+    });
+  }
+}
+class L {
+  svg;
+  scale;
+  constructor(t, e) {
+    const {
+      scale: s = 1,
+      backgroundColor: a = "none"
+    } = e || {};
+    t.innerHTML = "", this.scale = s, this.svg = document.createElementNS("http://www.w3.org/2000/svg", "svg"), this.svg.classList.add(`${E}-root`), this.svg.style.backgroundColor = a, this.svg.style.width = "100%", this.svg.style.width = "100%", t.appendChild(this.svg);
+  }
+  get element() {
+    return this.svg;
+  }
+  resize(t, e) {
+    this.svg.setAttribute("viewBox", `0 0 ${t} ${e}`), this.svg.setAttribute("width", `${t * this.scale}`);
+  }
+  createGroup(t, e = this.svg) {
+    const s = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    return s.classList.add(E + `-${t}`), e.appendChild(s), s;
+  }
+  line(t, e, s, a, r) {
+    const {
+      stroke: n = "currentColor",
+      strokeWidth: l = 1,
+      parent: c = this.svg,
+      className: u = void 0
+    } = r || {}, f = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    f.setAttribute("x1", String(t)), f.setAttribute("y1", String(e)), f.setAttribute("x2", String(s)), f.setAttribute("y2", String(a)), f.setAttribute("stroke", n), f.setAttribute("stroke-width", String(l)), u && f.classList.add(E + `-${u}`), c.appendChild(f);
+  }
+  path(t, e) {
+    const {
+      parent: s = this.svg,
+      translateX: a = 0,
+      translateY: r = 0,
+      scale: n = 0.2,
+      fill: l = "currentColor"
+    } = e || {}, c = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    c.setAttribute("d", t), c.setAttribute("transform", `translate(${a}, ${r}) scale(${n})`), c.setAttribute("fill", l), s.appendChild(c);
+  }
+}
+export {
+  L as SVGContext,
+  w as SingleStaffRenderer,
+  G as decreaseNotePitch,
+  _ as increaseNotePitch,
+  T as noteToAbsoluteIndex
+};

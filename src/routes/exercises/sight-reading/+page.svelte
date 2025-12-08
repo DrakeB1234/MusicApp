@@ -5,21 +5,17 @@
 	import ToggleButtonGroup from '$lib/components/ToggleButtonGroup.svelte';
 	import Wrapper from '$lib/components/Wrapper.svelte';
 	import { exercisesData } from '$lib/data/exercisesData';
-
-	type ExerciseParams = {
-		clef: string;
-		difficulty: string;
-	};
+	import type { ExerciseParams } from '$lib/exerciselogic/SightReadingExercise.svelte';
 
 	const exerciseEntry = exercisesData.find((e) => e.exerciseUrl === 'sight-reading');
 	let isStart: boolean = $state(false);
 	let exerciseParams: ExerciseParams = $state({
-		clef: 'grand',
-		difficulty: 'easy'
+		difficulty: 'easy',
+		clef: 'treble'
 	});
 
 	function handleStartExercise() {
-		if (!exerciseParams.clef || !exerciseParams.difficulty) return;
+		if (!exerciseParams.difficulty) return;
 		isStart = true;
 	}
 	function handleExitExercise() {
@@ -38,15 +34,6 @@
 					{ text: 'Hard', value: 'hard' }
 				]}
 				bind:value={exerciseParams.difficulty}
-			/>
-			<h2 class="body-regular bold">Clef</h2>
-			<ToggleButtonGroup
-				buttons={[
-					{ text: 'Grand', value: 'grand' },
-					{ text: 'Treble', value: 'treble' },
-					{ text: 'Bass', value: 'bass' }
-				]}
-				bind:value={exerciseParams.clef}
 			/>
 		{/snippet}
 		{#snippet actionButtons()}
