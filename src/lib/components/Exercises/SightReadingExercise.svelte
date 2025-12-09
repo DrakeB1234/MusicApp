@@ -10,10 +10,12 @@
 	import { midiService } from '$lib/midiservice/midiService.svelte';
 	import { sfxAudioService } from '$lib/audio/sfxAudioService.svelte';
 	import { SingleStaffRenderer, SVGContext } from '$lib/sola-score';
+	import ExerciseGameOver from './ExerciseGameOver.svelte';
 
 	const { handleExitPressed, params }: { handleExitPressed: () => void; params: ExerciseParams } =
 		$props();
 
+	// svelte-ignore non_reactive_update
 	let staffContainer: HTMLDivElement;
 	const game = new SightreadingExercise(params.difficulty, params.clef);
 
@@ -61,12 +63,16 @@
 				<p class="body-regular">Correct</p>
 			</div>
 			<div class="information-entry">
-				<p class="body-large bold">{game.triesLeftString}</p>
-				<p class="body-regular">Tries</p>
+				<p class="body-large bold">{game.timeLeftString}</p>
+				<p class="body-regular">Time Left</p>
 			</div>
 		</div>
 		<div class="game-viewport">
-			<div bind:this={staffContainer} class="staff-container"></div>
+			{#if !game.gameOverState}
+				<div bind:this={staffContainer} class="staff-container"></div>
+			{:else}
+				<ExerciseGameOver message="Times Up!" continuePressed={handleExitPressed} />
+			{/if}
 		</div>
 		<div class="game-inputs">
 			<NoteInputButtons

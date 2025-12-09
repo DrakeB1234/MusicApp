@@ -4,7 +4,6 @@ import { absoluteSemitoneToNote, noteToAbsoluteSemitone, noteToString, type Note
 import { type MidiMessage } from "$lib/midiservice/midiService.svelte";
 import type { SingleStaffRenderer } from "$lib/sola-score";
 import { TimerComponent } from "./TimerComponent.svelte";
-import { TriesComponent } from "./TriesComponent.svelte";
 
 type difficulty = "easy" | "medium" | "hard";
 
@@ -20,7 +19,7 @@ type NoteRange = {
 
 export type ExercisePresetConfig = {
   noteRanges: Record<string, NoteRange>;
-  tries: number;
+  timer: number;
   allowedAccidentals: string[] | null;
   accidentalChance: number | null;
 }
@@ -41,7 +40,7 @@ export const exercisePresetParams: Record<difficulty, ExercisePresetConfig> = {
         max: { name: "C", octave: 4, accidental: null },
       }
     },
-    tries: 5,
+    timer: 100,
     allowedAccidentals: null,
     accidentalChance: null
   },
@@ -60,7 +59,7 @@ export const exercisePresetParams: Record<difficulty, ExercisePresetConfig> = {
         max: { name: "C", octave: 4, accidental: null },
       }
     },
-    tries: 4,
+    timer: 80,
     allowedAccidentals: ["#"],
     accidentalChance: 0.20
   },
@@ -79,7 +78,7 @@ export const exercisePresetParams: Record<difficulty, ExercisePresetConfig> = {
         max: { name: "E", octave: 4, accidental: null },
       }
     },
-    tries: 3,
+    timer: 60,
     allowedAccidentals: ["#", "b"],
     accidentalChance: 0.20
   },
@@ -90,12 +89,12 @@ export class SightreadingExercise {
 
   score = $state(0);
   incorrectNote: Note | null = $state(null);
-  private triesComponent: TriesComponent | null;
+  private timer: TimerComponent | null;
   private currentNote: Note = { name: "C", octave: 4, accidental: null };
 
   private isGameOver = $state(false);
-  private correctNotesPlayed: number = $state(0);
-  private totalNotesPlayed: number = 0;
+  private correctNotesPlayed: number = 0;
+  private totalNotesPlayed: number = $state(0);
 
   private minSemitone: number;
   private maxSemitone: number;
@@ -113,7 +112,8 @@ export class SightreadingExercise {
     this.maxSemitone = noteToAbsoluteSemitone(this.currentExerciseParam.noteRanges[clef].max);
 
     this.currentNote = this.generateNewNote();
-    this.triesComponent = new TriesComponent(this.currentExerciseParam.tries, this.handleTriesOut);
+    this.timer = new TimerComponent(this.currentExerciseParam.timer, this.handleTimeout);
+    this.timer.start();
   }
 
   private handleDrawNoteOnStaff(note: Note) {
@@ -161,7 +161,7 @@ export class SightreadingExercise {
     else this.handleIncorrectNote(note);
   }
 
-  handleTriesOut = () => {
+  handleTimeout = () => {
     this.isGameOver = true;
     console.log("GAME OVER");
   }
@@ -180,27 +180,34 @@ export class SightreadingExercise {
 
   handleIncorrectNote(note: Note) {
     this.totalNotesPlayed += 1;
-    this.triesComponent?.decrementTries();
 
     sfxAudioService.play("wrong");
     this.incorrectNote = note;
   }
 
   destroy() {
-    this.triesComponent = null;
+    if (!this.timer) return;
+    this.timer.stop();
+    this.timer = null;
     this.staffRenderer = null;
   }
 
-  get triesLeftString(): string {
-    return String(this.triesComponent?.triesLeftCount);
+  get timeLeftString(): string {
+    if (!this.timer) return "";
+    const str = this.timer.formatTime();
+    return str;
   }
 
   get correctNotesPlayedString(): string {
-    return String(this.correctNotesPlayed);
+    return `${this.correctNotesPlayed} / ${this.totalNotesPlayed}`;
   }
 
   get currentNoteString(): string {
     return noteToString(this.currentNote);
+  }
+
+  get gameOverState(): boolean {
+    return this.isGameOver;
   }
 
   generateNewNote(): Note {
