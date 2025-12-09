@@ -44,8 +44,9 @@ a {
 :root {
   --palette-white: #ffffff;
   --palette-grey-50: #f0f1f5;
-  --palette-grey-100: #e0e2eb;
-  --palette-grey-200: #c1c6cf;
+  --palette-grey-100: #e9ebf1;
+  --palette-grey-150: #e1e4ec;
+  --palette-grey-200: #c7ccd6;
   --palette-grey-300: #a3a9b8;
   --palette-grey-400: #848da0;
   --palette-grey-500: #657088;
@@ -73,6 +74,7 @@ a {
   --font-size-base: 1rem;
   --font-size-large: 1.125rem;
   --font-size-xlarge: 1.5rem;
+  --font-size-2xlarge: 5rem;
 
   --font-width-1: 40ch;
   --font-width-2: 60ch;
@@ -102,7 +104,7 @@ a {
   --color-on-background: var(--palette-grey-800);
 
   --color-surface: var(--palette-grey-50);
-  --color-surface-dark: var(--palette-grey-100);
+  --color-surface-dark: var(--palette-grey-150);
   --color-surface-xdark: var(--palette-grey-200);
   --color-on-surface: var(--palette-grey-800);
 
@@ -172,7 +174,7 @@ a.button-text:hover {
 /* BUTTONS */
 
 button {
-  padding: var(--space-2) var(--space-3);
+  padding: var(--space-2) var(--space-4);
   cursor: pointer;
   color: var(--color-font);
   -webkit-tap-highlight-color: transparent;
@@ -232,10 +234,22 @@ button.on-background:hover {
   background-color: var(--color-background-dark);
 }
 
-.icon-container {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
+/* INPUTS */
+input {
+  color: var(--color-font);
+}
+
+input.reset {
+  border: none;
+  background: none;
+  padding: var(--space-1);
+}
+
+input.default {
+  padding: var(--space-1) var(--space-2);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
 }
 
 /* Font Classes */
@@ -248,6 +262,16 @@ p {
   line-height: 1.4;
   color: var(--color-font);
   max-width: var(--font-width-3);
+}
+
+.ui-xlarge {
+  font-size: var(--font-size-2xlarge);
+  line-height: 1;
+}
+
+.ui-large {
+  font-size: var(--font-size-xlarge);
+  line-height: 1;
 }
 
 .header-large {
@@ -283,7 +307,19 @@ p {
   background-color: var(--color-surface);
 }
 
+.card-secondary {
+  border: var(--border-style);
+  background-color: var(--color-surface);
+  border-radius: var(--radius-md);
+}
+
 a.link {
   text-decoration: none;
   color: inherit;
+}
+
+.icon-container {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
 }

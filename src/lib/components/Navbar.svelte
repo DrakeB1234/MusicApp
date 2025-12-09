@@ -99,17 +99,16 @@
 	.sidebar-container {
 		position: fixed;
 		top: 0;
-		right: -50dvw;
+		right: 0;
 		width: 50dvw;
 		height: 100vh;
 		background-color: var(--color-primary);
-		transition: right 0.2s ease-in-out;
 		display: none;
 		z-index: 12;
 		overflow-y: auto;
 	}
 	.sidebar-container.show {
-		right: 0;
+		display: block;
 	}
 	.mobile-header {
 		display: flex;
@@ -126,9 +125,6 @@
 			display: none;
 		}
 		button.mobile-menu-button {
-			display: block;
-		}
-		.sidebar-container {
 			display: block;
 		}
 		.backdrop {

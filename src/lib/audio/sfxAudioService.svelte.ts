@@ -1,5 +1,8 @@
 import { Howl } from 'howler';
 
+export const MIN_BPM = 40;
+export const MAX_BPM = 240;
+
 const SFX_MAP: Record<string, [number, number]> = {
   clickDown: [0, 500],
   clickUp: [500, 500],

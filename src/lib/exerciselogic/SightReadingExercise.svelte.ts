@@ -29,7 +29,7 @@ export const exercisePresetParams: Record<difficulty, ExercisePresetConfig> = {
     noteRanges: {
       "grand": {
         min: { name: "F", octave: 3, accidental: null },
-        max: { name: "F", octave: 5, accidental: null },
+        max: { name: "F", octave: 4, accidental: null },
       },
       "treble": {
         min: { name: "C", octave: 4, accidental: null },

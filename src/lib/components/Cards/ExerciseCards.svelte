@@ -6,7 +6,7 @@
 	const { summaryVersion = false } = $props();
 </script>
 
-<div class="card no-padding">
+<div class="card">
 	<h2 class="body-regular">Exercises</h2>
 	{#each exercisesData as data (data.id)}
 		<a href="/exercises/{data.exerciseUrl}" class="reset link-card-item">
@@ -31,6 +31,7 @@
 		display: flex;
 		flex-direction: column;
 		padding-block: var(--space-4);
+		height: fit-content;
 	}
 	h2 {
 		padding-inline: var(--space-4);

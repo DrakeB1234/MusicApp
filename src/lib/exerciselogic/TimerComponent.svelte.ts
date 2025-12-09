@@ -2,7 +2,7 @@ export class TimerComponent {
   timeLeft = $state(0);
   onTimeOut: () => void;
 
-  private interval: any;
+  private intervalId: ReturnType<typeof setInterval> | null = null;
 
   constructor(seconds: number, onTimeOut: () => void) {
     this.timeLeft = seconds;
@@ -10,8 +10,8 @@ export class TimerComponent {
   }
 
   start() {
-    if (this.interval) clearInterval(this.interval);
-    this.interval = setInterval(() => {
+    if (this.intervalId) clearInterval(this.intervalId);
+    this.intervalId = setInterval(() => {
       this.timeLeft--;
       if (this.timeLeft <= 0) {
         this.stop();
@@ -21,7 +21,8 @@ export class TimerComponent {
   }
 
   stop() {
-    clearInterval(this.interval);
+    if (this.intervalId) clearInterval(this.intervalId);
+    this.intervalId = null;
   }
 
   addTime(seconds: number) {
