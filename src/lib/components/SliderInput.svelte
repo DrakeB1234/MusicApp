@@ -9,6 +9,16 @@
 
 	let { value = $bindable(50), min = 0, max = 100, step = 1, label = '' }: Props = $props();
 
+	// Use local value for local state change, once slider is done (onChange), then update parent binded value
+	let localValue: number = $state(value);
+
+	function handleInput(e: Event & { currentTarget: HTMLInputElement }) {
+		localValue = Number(e.currentTarget.value);
+	}
+
+	function handleChange() {
+		value = localValue;
+	}
 	function handleIncrement() {
 		value += step;
 	}
@@ -18,10 +28,20 @@
 </script>
 
 <div class="slider-container">
-	<input type="range" bind:value {min} {max} {step} id="range-input" class="custom-slider" />
+	<input
+		type="range"
+		value={localValue}
+		oninput={handleInput}
+		onchange={handleChange}
+		{min}
+		{max}
+		{step}
+		id="range-input"
+		class="custom-slider"
+	/>
 	<div class="buttons-container">
 		<button class="secondary" onclick={handleDecrement}>-</button>
-		<p class="body-large">{value} {label}</p>
+		<p class="body-large">{localValue} {label}</p>
 		<button class="secondary" onclick={handleIncrement}>+</button>
 	</div>
 </div>

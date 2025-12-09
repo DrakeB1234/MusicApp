@@ -73,10 +73,10 @@
 <Wrapper maxWidth="var(--max-width-2)">
 	<main>
 		<div class="card">
-			<p class="ui-xlarge bold">{currentBeat + 1}</p>
+			<p class="ui-xlarge bold">{isPlaying ? currentBeat + 1 : 0}</p>
 			<ul class="beat-container">
 				{#each { length: beatCount }, i (i)}
-					<li class="beat" class:active={currentBeat === i}></li>
+					<li class="beat" class:active={currentBeat === i && isPlaying}></li>
 				{/each}
 			</ul>
 
@@ -122,7 +122,6 @@
 
 	.card {
 		padding-block: var(--space-4);
-		width: 100%;
 	}
 
 	p.ui-xlarge {
@@ -143,6 +142,7 @@
 		width: 16px;
 		height: 16px;
 		border-radius: var(--radius-full);
+		transition: var(--transition-color);
 	}
 
 	li.beat.active {

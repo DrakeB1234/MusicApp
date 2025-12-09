@@ -21,15 +21,15 @@
 		</a>
 	{/each}
 	{#if summaryVersion}
-		<a href="/exercises" class="button-secondary">All Exercises</a>
+		<div class="button-container">
+			<a href="/exercises" class="button-secondary">All Exercises</a>
+		</div>
 	{/if}
 </div>
 
 <style>
 	.card {
 		flex: 2;
-		display: flex;
-		flex-direction: column;
 		padding-block: var(--space-4);
 		height: fit-content;
 	}
@@ -52,9 +52,10 @@
 	.play-container {
 		margin-block: auto;
 	}
-	a.button-secondary {
-		margin-left: auto;
-		margin-right: var(--space-4);
-		margin-top: var(--space-4);
+	.button-container {
+		display: flex;
+		justify-content: end;
+		padding: var(--space-4);
+		padding-bottom: 0;
 	}
 </style>

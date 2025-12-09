@@ -16,15 +16,15 @@
 		</a>
 	{/each}
 	{#if summaryVersion}
-		<a href="/tools" class="button-secondary">All Tools</a>
+		<div class="button-container">
+			<a href="/tools" class="button-secondary">All Tools</a>
+		</div>
 	{/if}
 </div>
 
 <style>
 	.card {
 		flex: 1;
-		display: flex;
-		flex-direction: column;
 		padding-block: var(--space-4);
 		height: fit-content;
 	}
@@ -42,9 +42,10 @@
 	.link-card-item:hover {
 		background-color: var(--color-surface-dark);
 	}
-	a.button-secondary {
-		margin-left: auto;
-		margin-right: var(--space-4);
-		margin-top: var(--space-4);
+	.button-container {
+		display: flex;
+		justify-content: end;
+		padding: var(--space-4);
+		padding-bottom: 0;
 	}
 </style>

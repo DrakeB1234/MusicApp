@@ -1,4 +1,4 @@
-import { getNaturalNoteIndex, noteToAbsoluteSemitone, type Note } from '$lib/helpers/notehelpers';
+import { NATURAL_NOTE_NAMES, noteToAbsoluteSemitone, type Note } from '$lib/helpers/notehelpers';
 import { Howl, Howler } from 'howler';
 
 const SPRITE_MAP_ANCHOR_POINTS = [
@@ -38,13 +38,17 @@ const SPRITE_MAP: Record<string, [number, number]> = {
   C8: [42000, 3000],
 };
 
-class PianoAudioService {
-  isReady = $state(false);
-  isLoading = $state(false);
-  error = $state<string | null>(null);
-  isMuted = $state(false);
+export const MIN_OCTAVE = 1;
+export const MAX_OCTAVE = 8;
 
+class PianoAudioService {
   private sound: Howl | null = null;
+
+  private isReady = $state(false);
+  private isLoading = $state(false);
+  private isMuted = $state(false);
+
+  error = $state<string | null>(null);
 
   async init() {
     if (this.sound || this.isLoading) return;
@@ -96,7 +100,15 @@ class PianoAudioService {
       return;
     };
 
-    if (!note.octave || note.octave < 0) return;
+    if (note.octave == null || note.octave < MIN_OCTAVE || note.octave > MAX_OCTAVE) {
+      console.warn(`Invalid octave for note: '${note.octave}'`);
+      return;
+    };
+
+    if (!NATURAL_NOTE_NAMES.includes(note.name)) {
+      console.warn(`Invalid name for note: '${note.name}'`);
+      return;
+    };
 
     const strategy = this.calculateStrategy(note);
     if (!strategy) return;
@@ -105,7 +117,6 @@ class PianoAudioService {
 
     const rate = Math.pow(2, strategy.semitoneShift / 12);
     this.sound.rate(rate, soundId);
-
     this.sound.volume(1.0, soundId);
   }
 
