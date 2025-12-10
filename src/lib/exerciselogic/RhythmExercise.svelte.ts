@@ -49,6 +49,8 @@ const BPM_MS = 750;
 
 const TRIES_COUNT = 3;
 const TAP_THRESHOLD_MS = 150;
+const BARS_COUNT = 2;
+const BEATS_PER_BAR = 4;
 
 // const testTapTimestamps = [0, 750, 1500, 2250];
 const testTapTimestamps = [0, 325, 750, 1075, 1500, 1825, 2250, 2575];
@@ -85,16 +87,14 @@ export class RhythmExercise {
   private generateTimeStamps() {
     this.timeStampEntries = [];
 
-    const totalBars = 1;
-    const beatsPerBar = 4;
     let currentAccumulatedBeats = 0;
 
-    for (let b = 0; b < totalBars; b++) {
+    for (let b = 0; b < BARS_COUNT; b++) {
       let beatsInCurrentBar = 0;
 
-      while (beatsInCurrentBar < beatsPerBar) {
+      while (beatsInCurrentBar < BEATS_PER_BAR) {
 
-        const remainingSpace = beatsPerBar - beatsInCurrentBar;
+        const remainingSpace = BEATS_PER_BAR - beatsInCurrentBar;
 
         const validNotes = this.currentExerciseParam.allowedNoteDurations.filter(noteKey => {
           const beatValue = noteValuesMap[noteKey];
@@ -168,9 +168,12 @@ export class RhythmExercise {
 
     this.generateTimeStamps();
 
+    const startIterationCount = BEATS_PER_BAR + 1;
+    const inputIterationCount = BARS_COUNT * BEATS_PER_BAR + 1;
+
     // Starts inital countdown
-    this.currentStartCount = 5;
-    await this.timedFunctionComponent.startAndWait(5, BPM_MS, () => {
+    this.currentStartCount = startIterationCount;
+    await this.timedFunctionComponent.startAndWait(startIterationCount, BPM_MS, () => {
       this.currentStartCount--;
       if (this.currentStartCount <= 0) return;
       if (this.currentStartCount === 4) sfxAudioService.play("clickUp");
@@ -183,11 +186,11 @@ export class RhythmExercise {
     this.isListeningInput = true;
     let listeningStartTime = Date.now();
 
-    let currentTapCount = 5;
-    await this.timedFunctionComponent.startAndWait(5, BPM_MS, () => {
-      currentTapCount--;
-      if (currentTapCount <= 0) return;
-      if (currentTapCount === 4) sfxAudioService.play("clickUp");
+    let currentInputCount = inputIterationCount;
+    await this.timedFunctionComponent.startAndWait(inputIterationCount, BPM_MS, () => {
+      currentInputCount--;
+      if (currentInputCount <= 0) return;
+      if (currentInputCount % 4 === 0) sfxAudioService.play("clickUp");
       else sfxAudioService.play("clickDown");
     });
     this.isListeningInput = false;
