@@ -40,7 +40,7 @@ export const exercisePresetParams: Record<difficulty, ExercisePresetConfig> = {
         max: { name: "C", octave: 4, accidental: null },
       }
     },
-    timer: 100,
+    timer: 60,
     allowedAccidentals: null,
     accidentalChance: null
   },
@@ -59,7 +59,7 @@ export const exercisePresetParams: Record<difficulty, ExercisePresetConfig> = {
         max: { name: "C", octave: 4, accidental: null },
       }
     },
-    timer: 80,
+    timer: 60,
     allowedAccidentals: ["#"],
     accidentalChance: 0.20
   },
@@ -84,6 +84,9 @@ export const exercisePresetParams: Record<difficulty, ExercisePresetConfig> = {
   },
 }
 
+const CONSECUTIVE_CORRECT_COUNT = 3;
+const CONSECUTIVE_CORRECT_TIME_BONUS = 2;
+
 export class SightreadingExercise {
   private staffRenderer: SingleStaffRenderer | null = null;
 
@@ -95,6 +98,8 @@ export class SightreadingExercise {
   private isGameOver = $state(false);
   private correctNotesPlayed: number = 0;
   private totalNotesPlayed: number = $state(0);
+
+  private consecutiveCorrectNotes: number = $state(0);
 
   private minSemitone: number;
   private maxSemitone: number;
@@ -133,6 +138,39 @@ export class SightreadingExercise {
     });
   }
 
+  private handleTimeout = () => {
+    this.isGameOver = true;
+    console.log("GAME OVER");
+  }
+
+  private handleCorrectNote(note: Note) {
+    if (!note.octave) note.octave = this.currentNote.octave;
+    pianoAudioService.playNote(note);
+
+    if (this.consecutiveCorrectNotes >= CONSECUTIVE_CORRECT_COUNT) {
+      this.timer?.addTime(CONSECUTIVE_CORRECT_TIME_BONUS);
+      this.consecutiveCorrectNotes = 0;
+    }
+    else {
+      this.consecutiveCorrectNotes++;
+    }
+
+    this.totalNotesPlayed += 1;
+    this.correctNotesPlayed += 1;
+
+    const newNote = this.generateNewNote();
+    this.currentNote = newNote;
+
+  }
+
+  private handleIncorrectNote(note: Note) {
+    this.totalNotesPlayed += 1;
+    this.consecutiveCorrectNotes = 0;
+
+    sfxAudioService.play("wrong");
+    this.incorrectNote = note;
+  }
+
   setRenderer(renderer: SingleStaffRenderer) {
     if (this.staffRenderer) return;
     this.staffRenderer = renderer;
@@ -159,30 +197,6 @@ export class SightreadingExercise {
 
     if (noteToAbsoluteSemitone(note) === noteToAbsoluteSemitone(tempCurrentNote)) this.handleCorrectNote(note);
     else this.handleIncorrectNote(note);
-  }
-
-  handleTimeout = () => {
-    this.isGameOver = true;
-    console.log("GAME OVER");
-  }
-
-  handleCorrectNote(note: Note) {
-    if (!note.octave) note.octave = this.currentNote.octave;
-    pianoAudioService.playNote(note);
-
-    this.totalNotesPlayed += 1;
-    this.correctNotesPlayed += 1;
-
-    const newNote = this.generateNewNote();
-    this.currentNote = newNote;
-
-  }
-
-  handleIncorrectNote(note: Note) {
-    this.totalNotesPlayed += 1;
-
-    sfxAudioService.play("wrong");
-    this.incorrectNote = note;
   }
 
   destroy() {

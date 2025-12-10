@@ -203,6 +203,10 @@ button.secondary:hover {
   background-color: var(--color-surface-dark);
 }
 
+button.secondary:active {
+  background-color: var(--color-surface);
+}
+
 button.secondary.active {
   color: var(--color-on-primary);
   background-color: var(--color-primary);

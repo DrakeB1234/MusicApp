@@ -47,16 +47,16 @@ export const exercisesData: ExerciseDataEntry[] = [
       {
         header: "Gameplay Mechanics",
         text: [
-          "A note will appear on the staff on screen on start",
-          "You must press/play the correct corresponding note to earn points.",
-          "Get 3 notes wrong, and you lose!"
+          "Click the start button to begin the exercise.",
+          "A rhythm will appear on screen, then after 4 beats, you must tap the beat to the corresponding notes.",
+          "After failing 4 times, you get a game over!.",
         ]
       },
       {
         header: "Scoring",
         text: [
-          "The faster you answer, the bigger the bonus points are.",
-          "The harder difficulty options will provide more points",
+          "The bigger the streak of correct attempts, the bigger the score bonus!",
+          "The harder difficulty options will provide more points.",
         ]
       },
     ]

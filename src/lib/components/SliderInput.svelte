@@ -21,9 +21,11 @@
 	}
 	function handleIncrement() {
 		value += step;
+		localValue += step;
 	}
 	function handleDecrement() {
 		value -= step;
+		localValue -= step;
 	}
 </script>
 

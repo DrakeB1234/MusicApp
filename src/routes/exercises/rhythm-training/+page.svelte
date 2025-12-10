@@ -1,5 +1,7 @@
 <script lang="ts">
 	import ExerciseInfoLayout from '$lib/components/Exercises/ExerciseInfoLayout.svelte';
+	import RhythmExercise from '$lib/components/Exercises/RhythmExercise.svelte';
+	import ToggleButtonGroup from '$lib/components/ToggleButtonGroup.svelte';
 	import Wrapper from '$lib/components/Wrapper.svelte';
 	import { exercisesData } from '$lib/data/exercisesData';
 
@@ -9,7 +11,6 @@
 
 	function handleStartExercise() {
 		if (!selectedDifficulty) return;
-		console.log(selectedDifficulty);
 		isStart = true;
 	}
 	function handleExitExercise() {
@@ -19,7 +20,21 @@
 
 {#if !isStart}
 	<ExerciseInfoLayout exerciseEntry={exerciseEntry!} handleStartPressed={handleStartExercise}>
-		{#snippet inputs()}{/snippet}
+		{#snippet inputs()}
+			<h2 class="body-regular bold">Difficulty</h2>
+			<ToggleButtonGroup
+				buttons={[
+					{ text: 'Easy', value: 'easy' },
+					{ text: 'Medium', value: 'medium' },
+					{ text: 'Hard', value: 'hard' }
+				]}
+				bind:value={selectedDifficulty}
+			/>
+		{/snippet}
 		{#snippet actionButtons()}{/snippet}
 	</ExerciseInfoLayout>
+{:else}
+	<Wrapper>
+		<RhythmExercise handleExitPressed={handleExitExercise} params={selectedDifficulty} />
+	</Wrapper>
 {/if}

@@ -11,7 +11,7 @@
 	let isStart: boolean = $state(false);
 	let exerciseParams: ExerciseParams = $state({
 		difficulty: 'easy',
-		clef: 'grand'
+		clef: 'treble'
 	});
 
 	function handleStartExercise() {
@@ -38,9 +38,9 @@
 			<h2 class="body-regular bold">Clef</h2>
 			<ToggleButtonGroup
 				buttons={[
-					{ text: 'Grand', value: 'grand' },
 					{ text: 'Treble', value: 'treble' },
-					{ text: 'Bass', value: 'bass' }
+					{ text: 'Bass', value: 'bass' },
+					{ text: 'Grand', value: 'grand' }
 				]}
 				bind:value={exerciseParams.clef}
 			/>
