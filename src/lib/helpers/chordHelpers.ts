@@ -32,23 +32,40 @@ export const CHORD_QUALITIES: Record<string, number[]> = {
   "minadd9": [0, 3, 7, 14]
 };
 
-const REGEX_CHORD_STRING = /^(?<root>[a-gA-G])(?<accidental>[b#]?)(?<quality>\w*)$/
+// Note corresponds to the amount of sharps (+) or flats (-) in the given key
+const CIRCLE_OF_FIFTHS_POS: Record<string, number> = {
+  "C": 0,
+  "G": 1, "D": 2, "A": 3, "E": 4, "B": 5, "F#": 6, "C#": 7,
+  "F": -1, "Bb": -2, "Eb": -3, "Ab": -4, "Db": -5, "Gb": -6, "Cb": -7
+};
+
+const REGEX_CHORD_STRING = /^(?<root>[a-gA-G])(?<accidental>[b#]?)(?<quality>\w*)$/;
+
+function getPreferFlatsByEnharmonicPreference(root: string, quality: string): boolean {
+  // Get circle position (default to 0 if unknown)
+  // This is determining the amount of sharps / flats in a key
+  // Look at a circle of fifths for reference
+  const circlePos = CIRCLE_OF_FIFTHS_POS[root] ?? 0;
+
+  const isMinorLike = quality.includes("min") || quality.includes("dim");
+  const harmonicScore = circlePos + (isMinorLike ? -3 : 0);
+
+  const preferFlats = harmonicScore < 0;
+
+  return preferFlats;
+}
 
 export function chordStringToNotes(chordName: string, rootOctave: number = 4): Note[] {
   const match = chordName.match(REGEX_CHORD_STRING);
+  if (!match || !match.groups) throw new Error(`Invalid chord string: ${chordName}`);
 
-  if (!match || !match.groups) {
-    throw new Error(`Invalid chord string: ${chordName}`);
-  }
+  const [_, root, accidentalRaw, quality] = match;
+  const accidental = accidentalRaw || "";
 
-  const [_, root, accidental, quality] = match;
-
+  const preferFlats = getPreferFlatsByEnharmonicPreference(root + accidental, quality);
 
   const intervals = CHORD_QUALITIES[quality];
-
-  if (!intervals) {
-    throw new Error(`Unknown chord quality: ${quality}`);
-  }
+  if (!intervals) throw new Error(`Unknown chord quality: ${quality}`);
 
   const rootNote: Note = {
     name: root,
@@ -59,8 +76,7 @@ export function chordStringToNotes(chordName: string, rootOctave: number = 4): N
   const rootSemitone = noteToAbsoluteSemitone(rootNote);
 
   return intervals.map(interval => {
-    const note = absoluteSemitoneToNote(rootSemitone + interval);
-    return note;
+    return absoluteSemitoneToNote(rootSemitone + interval, preferFlats);
   });
 };
 

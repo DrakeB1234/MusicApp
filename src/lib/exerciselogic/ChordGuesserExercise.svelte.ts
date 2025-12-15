@@ -71,6 +71,7 @@ export class ChordGuesserExercise {
 
   private handleTriesOut = () => {
     this.isGameOver = true;
+    this.timeLeft = 0;
   }
 
   setRenderer = (renderer: MusicStaff) => {
@@ -125,9 +126,9 @@ export class ChordGuesserExercise {
     if (this.isGameOver || !this.triesComponent || !this.timedFunctionComponent) return;
     this.attemptedInput = false;
     this.currentChord = this.generateNewChord();
+
     this.staffRenderer!.clearAllNotes();
     this.staffRenderer!.drawChord(this.currentChord.notes.map(e => noteToVectorScoreString(e)));
-    console.log(this.currentChord)
 
     this.isListeningInput = true;
     this.timeLeft = this.currentExerciseParam.timeToGuess;

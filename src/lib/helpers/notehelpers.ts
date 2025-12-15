@@ -25,20 +25,45 @@ export function midiSemitoneToNote(semitone: number): Note {
   return newNote;
 }
 
-export function absoluteSemitoneToNote(semitone: number): Note {
+export function absoluteSemitoneToNote(semitone: number, preferFlats: boolean = false): Note {
   const octave = Math.floor(semitone / 12);
   const noteSemitoneDifference = Math.floor(semitone % 12);
-  let accidental: string | null = null;
-  let nameOffset = Object.entries(NATURAL_NOTE_SEMITONE_OFFSETS).find(e => e[1] === noteSemitoneDifference);
 
-  if (nameOffset === undefined) {
-    const accidentalSemitoneDifference = noteSemitoneDifference - 1;
-    nameOffset = Object.entries(NATURAL_NOTE_SEMITONE_OFFSETS).find(e => e[1] === accidentalSemitoneDifference);
-    accidental = "#";
+  // Try to find a natural note first (e.g., C, D, E)
+  let nameOffset = Object.entries(NATURAL_NOTE_SEMITONE_OFFSETS).find(e => e[1] === noteSemitoneDifference);
+  let accidental: string | null = null;
+  let noteName: string;
+
+  if (nameOffset) {
+    // If it's a natural note (white key), just return it
+    noteName = nameOffset[0];
+  } else {
+    if (preferFlats) {
+      const targetNatural = noteSemitoneDifference + 1;
+
+      // Handle the wrap-around case (e.g. searching for C above B)
+      nameOffset = Object.entries(NATURAL_NOTE_SEMITONE_OFFSETS).find(e => e[1] === targetNatural);
+
+      if (nameOffset) {
+        noteName = nameOffset[0];
+        accidental = "b";
+      } else {
+        const targetNaturalBelow = noteSemitoneDifference - 1;
+        nameOffset = Object.entries(NATURAL_NOTE_SEMITONE_OFFSETS).find(e => e[1] === targetNaturalBelow)!;
+        noteName = nameOffset[0];
+        accidental = "#";
+      }
+
+    } else {
+      const targetNatural = noteSemitoneDifference - 1;
+      nameOffset = Object.entries(NATURAL_NOTE_SEMITONE_OFFSETS).find(e => e[1] === targetNatural)!;
+      noteName = nameOffset[0];
+      accidental = "#";
+    }
   }
 
   return {
-    name: nameOffset?.[0]!,
+    name: noteName,
     octave: octave,
     accidental: accidental
   };
