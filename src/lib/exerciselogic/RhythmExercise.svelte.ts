@@ -1,10 +1,8 @@
-import { pianoAudioService } from "$lib/audio/pianoAudioService.svelte";
 import { sfxAudioService } from "$lib/audio/sfxAudioService.svelte";
-import { absoluteSemitoneToNote, noteToAbsoluteSemitone, noteToString, type Note } from "$lib/helpers/notehelpers";
-import { type MidiMessage } from "$lib/midiservice/midiService.svelte";
+import type { RhythmStaff } from "vector-score";
 import { TimedFunctionComponent } from "./TimedFunctionComponent.svelte";
-import { TimerComponent } from "./TimerComponent.svelte";
 import { TriesComponent } from "./TriesComponent.svelte";
+import { rhythmStringToVectorScoreData } from "$lib/helpers/notehelpers";
 
 type difficulty = "easy" | "medium" | "hard";
 
@@ -25,15 +23,15 @@ type TimeStampEntry = {
 export const exercisePresetParams: Record<difficulty, ExercisePresetConfig> = {
   easy: {
     allowedNoteDurations: ["w", "h", "q"],
-    allowedRests: ["w"]
+    allowedRests: ["q"]
   },
   medium: {
-    allowedNoteDurations: ["w", "h", "q", "e"],
-    allowedRests: ["w"]
+    allowedNoteDurations: ["h", "q", "e"],
+    allowedRests: ["q, e"]
   },
   hard: {
-    allowedNoteDurations: ["w", "h", "q", "e"],
-    allowedRests: ["w"]
+    allowedNoteDurations: ["h", "q", "e"],
+    allowedRests: ["h, q, e"]
   },
 }
 
@@ -47,7 +45,7 @@ const noteValuesMap: Record<string, number> = {
 const BPM_MS = 750;
 
 const TRIES_COUNT = 3;
-const TAP_THRESHOLD_MS = 150;
+const TAP_THRESHOLD_MS = 175;
 const BARS_COUNT = 2;
 const BEATS_PER_BAR = 4;
 
@@ -55,6 +53,8 @@ const BEATS_PER_BAR = 4;
 const testTapTimestamps = [0, 325, 750, 1075, 1500, 1825, 2250, 2575];
 
 export class RhythmExercise {
+  private staffRenderer: RhythmStaff | null = null;
+
   private triesComponent: TriesComponent | null;
   private timedFunctionComponent: TimedFunctionComponent | null;
 
@@ -115,7 +115,9 @@ export class RhythmExercise {
     }
   }
 
-  test = () => {
+  setRenderer = (renderer: RhythmStaff) => {
+    if (this.staffRenderer) return;
+    this.staffRenderer = renderer;
   }
 
   private validateInput(listeningStartTime: number) {
@@ -164,6 +166,20 @@ export class RhythmExercise {
     if (this.isGameOver || !this.timedFunctionComponent || !this.triesComponent) return;
 
     this.generateTimeStamps();
+    const noteStrings = this.timeStampEntries.map(e => e.note);
+    const staffData = rhythmStringToVectorScoreData(noteStrings);
+
+    this.staffRenderer!.clearAllNotes();
+    staffData.forEach(noteGroup => {
+      // If sub arr is all 'e' notes, draw a beamed note
+      if (noteGroup.length > 1 && noteGroup.every(note => note === "e")) {
+        this.staffRenderer!.drawBeamedNotes("e", noteGroup.length);
+      }
+      // else, draw regular notes
+      else {
+        this.staffRenderer!.drawNote(noteGroup);
+      }
+    });
 
     const startIterationCount = BEATS_PER_BAR + 1;
     const inputIterationCount = BARS_COUNT * BEATS_PER_BAR + 1;
@@ -189,8 +205,10 @@ export class RhythmExercise {
       if (currentInputCount <= 0) return;
       if (currentInputCount % 4 === 0) sfxAudioService.play("clickUp");
       else sfxAudioService.play("clickDown");
+      this.staffRenderer!.incrementCurrentBeatUI();
     });
     this.isListeningInput = false;
+    this.staffRenderer!.resetCurrentBeatUI();
 
     this.validateInput(listeningStartTime);
   }

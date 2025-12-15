@@ -27,6 +27,7 @@
 		"globals": "^16.5.0",
 		"prettier": "^3.6.2",
 		"prettier-plugin-svelte": "^3.4.0",
+		"rollup-plugin-visualizer": "^6.0.5",
 		"svelte": "^5.43.8",
 		"svelte-check": "^4.3.4",
 		"svelte-render-scan": "^1.1.0",
@@ -38,6 +39,7 @@
 		"cookie": "^0.7.0"
 	},
 	"dependencies": {
-		"howler": "^2.2.4"
+		"howler": "^2.2.4",
+		"vector-score": "github:DrakeB1234/VectorScore"
 	}
 }

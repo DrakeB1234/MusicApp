@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { pianoAudioService } from '$lib/audio/pianoAudioService.svelte';
 	import { onMount } from 'svelte';
-	import ExitIcon from '$lib/components/Icons/ExitIcon.svelte';
 	import NoteInputButtons from '$lib/components/Inputs/NoteInputButtons.svelte';
 	import {
 		SightreadingExercise,
@@ -9,9 +8,9 @@
 	} from '$lib/exerciselogic/SightReadingExercise.svelte';
 	import { midiService } from '$lib/midiservice/midiService.svelte';
 	import { sfxAudioService } from '$lib/audio/sfxAudioService.svelte';
-	import { SingleStaffRenderer, SVGContext } from '$lib/sola-score';
 	import ExerciseGameOver from './ExerciseGameOver.svelte';
 	import ExerciseShell from './ExerciseShell.svelte';
+	import { MusicStaff, type StaffTypes } from 'vector-score';
 
 	const { handleExitPressed, params }: { handleExitPressed: () => void; params: ExerciseParams } =
 		$props();
@@ -35,19 +34,17 @@
 	});
 
 	function setupStaff(node: HTMLElement) {
-		const staffSvgCtx = new SVGContext(node, {
-			scale: 1.6,
-			backgroundColor: 'var(--color-surface)'
+		const newStaff = new MusicStaff(node, {
+			staffType: params.clef as StaffTypes,
+			width: 200,
+			scale: 1.4,
+			spaceAbove: 3,
+			spaceBelow: 4,
+			staffColor: 'var(--color-font)',
+			staffBackgroundColor: 'var(--color-background)'
 		});
 
-		const staffRenderer = new SingleStaffRenderer(staffSvgCtx, {
-			staffType: params.clef as any,
-			width: 150,
-			spacesAbove: 3,
-			spacesBelow: 4
-		});
-
-		game.setRenderer(staffRenderer);
+		game.setRenderer(newStaff);
 	}
 </script>
 

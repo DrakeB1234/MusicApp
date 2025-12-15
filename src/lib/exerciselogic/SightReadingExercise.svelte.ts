@@ -1,7 +1,8 @@
 import { pianoAudioService } from "$lib/audio/pianoAudioService.svelte";
 import { sfxAudioService } from "$lib/audio/sfxAudioService.svelte";
-import { absoluteSemitoneToNote, noteToAbsoluteSemitone, noteToString, type Note } from "$lib/helpers/notehelpers";
+import { absoluteSemitoneToNote, noteToAbsoluteSemitone, noteToString, noteToVectorScoreString, type Note } from "$lib/helpers/notehelpers";
 import { type MidiMessage } from "$lib/midiservice/midiService.svelte";
+import type { MusicStaff } from "vector-score";
 import { TimerComponent } from "./TimerComponent.svelte";
 
 type difficulty = "easy" | "medium" | "hard";
@@ -87,7 +88,7 @@ const CONSECUTIVE_CORRECT_COUNT = 3;
 const CONSECUTIVE_CORRECT_TIME_BONUS = 2;
 
 export class SightreadingExercise {
-  private staffRenderer: SingleStaffRenderer | null = null;
+  private staffRenderer: MusicStaff | null = null;
 
   score = $state(0);
   incorrectNote: Note | null = $state(null);
@@ -122,19 +123,9 @@ export class SightreadingExercise {
 
   private handleDrawNoteOnStaff(note: Note) {
     if (!this.staffRenderer) return;
-    this.staffRenderer.clearAllNotes();
 
-    let staffIndex = 0;
-    if (this.staffClefType === "grand") {
-      if (noteToAbsoluteSemitone(note) < 48) {
-        staffIndex = 1;
-      }
-    }
-
-    this.staffRenderer.createNoteOnStaff({
-      note: { name: note.name, octave: note.octave!, accidental: note.accidental },
-      staffGroupIndex: staffIndex
-    });
+    this.staffRenderer.changeNoteByIndex(noteToVectorScoreString(note), 0);
+    this.staffRenderer.justifyNotes();
   }
 
   private handleTimeout = () => {
@@ -170,10 +161,12 @@ export class SightreadingExercise {
     this.incorrectNote = note;
   }
 
-  setRenderer(renderer: SingleStaffRenderer) {
+  setRenderer(renderer: MusicStaff) {
     if (this.staffRenderer) return;
     this.staffRenderer = renderer;
-    this.handleDrawNoteOnStaff(this.currentNote);
+    const vsNoteStr = noteToVectorScoreString(this.currentNote);
+    this.staffRenderer.drawNote(vsNoteStr);
+    this.staffRenderer.justifyNotes();
   }
 
   handleMidiInput = (message: MidiMessage) => {

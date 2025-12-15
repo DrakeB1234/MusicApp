@@ -4,6 +4,7 @@
 	import ExerciseShell from './ExerciseShell.svelte';
 	import { RhythmExercise } from '$lib/exerciselogic/RhythmExercise.svelte';
 	import StartStopIcon from '../Icons/StartStopIcon.svelte';
+	import { RhythmStaff } from 'vector-score';
 
 	const { handleExitPressed, params }: { handleExitPressed: () => void; params: string } = $props();
 
@@ -19,8 +20,25 @@
 		game.destroy();
 	});
 
+	// Toggles internal state, which renders staff container, on mount its calls setupStaff due to the staff container div
+	// use:setupStaff
 	function handleStart() {
 		isStart = true;
+	}
+
+	function setupStaff(node: HTMLElement) {
+		const newStaff = new RhythmStaff(node, {
+			width: 360,
+			scale: 1.4,
+			barsCount: 2,
+			topNumber: 4,
+			spaceAbove: 3,
+			spaceBelow: 4,
+			staffColor: 'var(--color-font)',
+			staffBackgroundColor: 'var(--color-background)'
+		});
+
+		game.setRenderer(newStaff);
 		game.start();
 	}
 </script>
@@ -48,11 +66,7 @@
 					<p class="body-large bold">{game.currentStartTimeCount}</p>
 				</div>
 				<p class="body-large">Game</p>
-				<div class="notes-container">
-					{#each game.currentNoteStrings as note}
-						<p class="body-regular bold">{note}</p>
-					{/each}
-				</div>
+				<div use:setupStaff class="staff-container"></div>
 			</div>
 		{/if}
 	{/snippet}
@@ -62,7 +76,6 @@
 				>TAP HERE</button
 			>
 			<button class="secondary custom" onclick={game.reset}>reset</button>
-			<button class="secondary custom" onclick={game.test}>test</button>
 		</div>
 	{/snippet}
 </ExerciseShell>
@@ -89,10 +102,8 @@
 	.game-container {
 		display: block;
 	}
-	.notes-container {
-		display: flex;
-		justify-content: center;
-		gap: var(--space-2);
+	.staff-container {
+		margin-inline: auto;
 	}
 	.countdown-container {
 		text-align: center;

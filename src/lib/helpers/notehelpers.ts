@@ -64,3 +64,48 @@ export function noteToString(note: Note): string {
   if (note.duration) str += `/${note.duration}`;
   return str;
 }
+
+export function noteToVectorScoreString(note: Note): string {
+  let str = note.name;
+
+  str += note.accidental ?? "";
+  str += note.octave ?? "0";
+  str += note.duration ?? "w";
+
+  return str
+}
+
+export function rhythmStringToVectorScoreData(notes: string[]): string[][] {
+  const result: string[][] = [];
+  let currentGroup: string[] = [];
+  let consecutiveEGroup: string[] = [];
+
+  for (let i = 0; i < notes.length; i++) {
+    const note = notes[i];
+
+    if (note === 'e') {
+      if (currentGroup.length > 0) {
+        result.push(currentGroup);
+        currentGroup = [];
+      }
+
+      consecutiveEGroup.push(note);
+
+    } else {
+      if (consecutiveEGroup.length > 0) {
+        result.push(consecutiveEGroup);
+        consecutiveEGroup = [];
+      }
+
+      currentGroup.push(note);
+    }
+  }
+
+  if (consecutiveEGroup.length > 0) {
+    result.push(consecutiveEGroup);
+  } else if (currentGroup.length > 0) {
+    result.push(currentGroup);
+  }
+
+  return result;
+}
