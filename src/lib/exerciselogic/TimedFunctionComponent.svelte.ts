@@ -4,7 +4,7 @@ export class TimedFunctionComponent {
   private currentIterationsLeft: number = 0;
   private timerResolve: (() => void) | null = null;
 
-  async startAndWait(iterations: number, interval: number, tickCallback?: () => void): Promise<void> {
+  async startAndWait(iterations: number, interval: number, tickCallback?: () => void, intialCall: boolean = true): Promise<void> {
     this.stop();
 
     if (interval < 250) return;
@@ -12,9 +12,14 @@ export class TimedFunctionComponent {
 
     if (iterations > 100) return;
 
-    // Immediately invoke callback
-    if (tickCallback) tickCallback();
-    this.currentIterationsLeft = iterations - 1;
+    // Immediately invoke callback if prop initialCall
+    if (intialCall) {
+      if (tickCallback) tickCallback();
+      this.currentIterationsLeft = iterations - 1;
+    }
+    else {
+      this.currentIterationsLeft = iterations;
+    }
 
     return new Promise((resolve) => {
       this.timerResolve = resolve;

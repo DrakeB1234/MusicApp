@@ -46,13 +46,12 @@
 
 	function handleBeatChange(e: Event & { currentTarget: HTMLInputElement }) {
 		const inputValue = e.currentTarget.value;
-		if (!inputValue.match('[0-9]')) {
-			beatCount = 1;
+		if (!inputValue.match('^[0-9]$')) {
+			beatCount = 4;
+			e.currentTarget.value = beatCount.toString();
 			return;
 		}
 		let value = Number(inputValue);
-		if (value < 1) value = 1;
-		else if (value > 9) value = 9;
 
 		beatCount = value;
 	}
@@ -177,6 +176,7 @@
 	}
 
 	input#beats {
-		width: 5ch;
+		text-align: center;
+		width: 4ch;
 	}
 </style>
