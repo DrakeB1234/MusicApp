@@ -83,7 +83,7 @@ export function rhythmStringToVectorScoreData(notes: string[]): string[][] {
   for (let i = 0; i < notes.length; i++) {
     const note = notes[i];
 
-    if (note === 'e') {
+    if (note === 'e' && consecutiveEGroup.length < 4) {
       if (currentGroup.length > 0) {
         result.push(currentGroup);
         currentGroup = [];
@@ -103,6 +103,7 @@ export function rhythmStringToVectorScoreData(notes: string[]): string[][] {
 
   if (consecutiveEGroup.length > 0) {
     result.push(consecutiveEGroup);
+    consecutiveEGroup = [];
   } else if (currentGroup.length > 0) {
     result.push(currentGroup);
   }

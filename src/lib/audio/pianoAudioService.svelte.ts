@@ -1,4 +1,4 @@
-import { NATURAL_NOTE_NAMES, noteToAbsoluteSemitone, type Note } from '$lib/helpers/notehelpers';
+import { absoluteSemitoneToNote, NATURAL_NOTE_NAMES, noteToAbsoluteSemitone, type Note } from '$lib/helpers/notehelpers';
 import { Howl, Howler } from 'howler';
 
 const SPRITE_MAP_ANCHOR_POINTS = [
@@ -38,8 +38,13 @@ const SPRITE_MAP: Record<string, [number, number]> = {
   C8: [42000, 3000],
 };
 
-export const MIN_OCTAVE = 1;
+export const MIN_OCTAVE = 0;
 export const MAX_OCTAVE = 8;
+
+// A0
+const MIN_PLAYABLE_SEMITONE = 9;
+// C8
+const MAX_PLAYABLE_SEMITONE = 96;
 
 class PianoAudioService {
   private sound: Howl | null = null;
@@ -96,21 +101,22 @@ class PianoAudioService {
   }
   playNote(note: Note) {
     if (!this.isReady || !this.sound) {
-      console.warn("Audio was requested, but pianoAudioService was never intialized.");
-      return;
+      throw new Error("Audio was requested, but pianoAudioService was never intialized.");
     };
 
     if (note.octave == null || note.octave < MIN_OCTAVE || note.octave > MAX_OCTAVE) {
-      console.warn(`Invalid octave for note: '${note.octave}'`);
-      return;
+      throw new Error(`Invalid octave for note: '${note.octave}'`);
     };
 
     if (!NATURAL_NOTE_NAMES.includes(note.name)) {
-      console.warn(`Invalid name for note: '${note.name}'`);
-      return;
+      throw new Error(`Invalid name for note: '${note.name}'`);
     };
 
-    const strategy = this.calculateStrategy(note);
+    const noteSemitone = noteToAbsoluteSemitone(note);
+    const clampedSemitone = Math.min(Math.max(noteSemitone, MIN_PLAYABLE_SEMITONE), MAX_PLAYABLE_SEMITONE);
+    const fixedNote = absoluteSemitoneToNote(clampedSemitone);
+
+    const strategy = this.calculateStrategy(fixedNote);
     if (!strategy) return;
 
     const soundId = this.sound.play(strategy.sampleName);

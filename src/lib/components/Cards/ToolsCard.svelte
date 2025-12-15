@@ -3,11 +3,13 @@
 	import CardIconWrapper from '../CardIconWrapper.svelte';
 
 	const { summaryVersion = false } = $props();
+
+	const fixedToolsData = summaryVersion ? toolsData.slice(0, 3) : toolsData;
 </script>
 
 <div class="card">
 	<h2 class="body-regular">Tools</h2>
-	{#each toolsData as data (data.id)}
+	{#each fixedToolsData as data (data.id)}
 		<a href="/tools/{data.url}" class="reset link-card-item">
 			<CardIconWrapper url={data.iconUrl} title={data.title} />
 			<div class="card-text">

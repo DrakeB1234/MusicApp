@@ -23,5 +23,5 @@ export const toolsData: ToolsDataEntry[] = [
     url: "digital-piano",
     title: "Digital Piano",
     iconUrl: "icons/PianoIcon.svg",
-  },
+  }
 ]

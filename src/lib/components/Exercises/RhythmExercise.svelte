@@ -63,9 +63,8 @@
 		{:else}
 			<div class="game-container">
 				<div class="countdown-container">
-					<p class="body-large bold">{game.currentStartTimeCount}</p>
+					<p class="ui-large bold">{game.currentStartTimeCount}</p>
 				</div>
-				<p class="body-large">Game</p>
 				<div use:setupStaff class="staff-container"></div>
 			</div>
 		{/if}
@@ -89,6 +88,7 @@
 	}
 	button.custom {
 		padding: var(--space-4) var(--space-6);
+		transition: none;
 	}
 	button.custom:active {
 		background-color: var(--color-primary);
@@ -104,6 +104,7 @@
 	}
 	.staff-container {
 		margin-inline: auto;
+		padding: 1rem;
 	}
 	.countdown-container {
 		text-align: center;

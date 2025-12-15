@@ -1,14 +1,16 @@
-<script>
+<script lang="ts">
 	import PlayIcon from '../Icons/PlayIcon.svelte';
 	import { exercisesData } from '$lib/data/exercisesData';
 	import CardIconWrapper from '../CardIconWrapper.svelte';
 
 	const { summaryVersion = false } = $props();
+
+	const fixedExerciseData = summaryVersion ? exercisesData.slice(0, 3) : exercisesData;
 </script>
 
 <div class="card">
 	<h2 class="body-regular">Exercises</h2>
-	{#each exercisesData as data (data.id)}
+	{#each fixedExerciseData as data (data.id)}
 		<a href="/exercises/{data.exerciseUrl}" class="reset link-card-item">
 			<CardIconWrapper url={data.iconUrl} title={data.title} />
 			<div class="card-text">
