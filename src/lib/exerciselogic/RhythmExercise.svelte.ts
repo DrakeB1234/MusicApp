@@ -2,7 +2,6 @@ import { pianoAudioService } from "$lib/audio/pianoAudioService.svelte";
 import { sfxAudioService } from "$lib/audio/sfxAudioService.svelte";
 import { absoluteSemitoneToNote, noteToAbsoluteSemitone, noteToString, type Note } from "$lib/helpers/notehelpers";
 import { type MidiMessage } from "$lib/midiservice/midiService.svelte";
-import type { SingleStaffRenderer } from "$lib/sola-score";
 import { TimedFunctionComponent } from "./TimedFunctionComponent.svelte";
 import { TimerComponent } from "./TimerComponent.svelte";
 import { TriesComponent } from "./TriesComponent.svelte";
@@ -56,8 +55,6 @@ const BEATS_PER_BAR = 4;
 const testTapTimestamps = [0, 325, 750, 1075, 1500, 1825, 2250, 2575];
 
 export class RhythmExercise {
-  private staffRenderer: SingleStaffRenderer | null = null;
-
   private triesComponent: TriesComponent | null;
   private timedFunctionComponent: TimedFunctionComponent | null;
 
@@ -132,7 +129,7 @@ export class RhythmExercise {
         const inputTimestamp = e - listeningStartTime;
         const difference = inputTimestamp - this.timeStampEntries[i].timeStamp;
 
-        if (difference > TAP_THRESHOLD_MS) {
+        if (difference > TAP_THRESHOLD_MS || difference < 0) {
           pass = false
         }
       });

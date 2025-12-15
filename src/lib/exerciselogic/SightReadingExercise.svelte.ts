@@ -2,7 +2,6 @@ import { pianoAudioService } from "$lib/audio/pianoAudioService.svelte";
 import { sfxAudioService } from "$lib/audio/sfxAudioService.svelte";
 import { absoluteSemitoneToNote, noteToAbsoluteSemitone, noteToString, type Note } from "$lib/helpers/notehelpers";
 import { type MidiMessage } from "$lib/midiservice/midiService.svelte";
-import type { SingleStaffRenderer } from "$lib/sola-score";
 import { TimerComponent } from "./TimerComponent.svelte";
 
 type difficulty = "easy" | "medium" | "hard";
