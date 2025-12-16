@@ -7,7 +7,6 @@
 	import { ChordGuesserExercise } from '$lib/exerciselogic/ChordGuesserExercise.svelte';
 	import { midiService } from '$lib/midiservice/midiService.svelte';
 	import ExerciseGeneralInput from '../Inputs/ExerciseGeneralInput.svelte';
-	import { chordStringToNotes, notesToChordString } from '$lib/helpers/chordHelpers';
 	import { pianoAudioService } from '$lib/audio/pianoAudioService.svelte';
 
 	const { handleExitPressed, params }: { handleExitPressed: () => void; params: string } = $props();
@@ -85,7 +84,7 @@
 	{#snippet controls()}
 		<div class="input">
 			<ExerciseGeneralInput
-				buttonValues={['Cmaj', 'Cmin', 'Dmaj7']}
+				buttonValues={game.buttonChordStrings}
 				handleButtonPressed={game.handleInput}
 				incorrectValue={game.incorrectChord}
 				disableInputs={!isStart}

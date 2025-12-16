@@ -1,8 +1,11 @@
 <script>
-	const { url, title } = $props();
+	const { url, title, backgroundColor = '', borderColor = '' } = $props();
 </script>
 
-<div class="icon-container">
+<div
+	class="icon-container"
+	style="background-color: {backgroundColor}; {borderColor && `border:3px solid ${borderColor}`};"
+>
 	<img src="/{url}" alt={title} />
 </div>
 
@@ -12,7 +15,6 @@
 		align-items: center;
 		border-radius: var(--radius-lg);
 		padding: var(--space-2);
-		background-color: var(--color-primary-light);
 		height: fit-content;
 		max-width: 60px;
 		max-height: 60px;

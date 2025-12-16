@@ -11,7 +11,7 @@
 	<h2 class="body-regular">Tools</h2>
 	{#each fixedToolsData as data (data.id)}
 		<a href="/tools/{data.url}" class="reset link-card-item">
-			<CardIconWrapper url={data.iconUrl} title={data.title} />
+			<CardIconWrapper url={data.iconUrl} title={data.title} borderColor={data.color} />
 			<div class="card-text">
 				<h3 class="body-regular">{data.title}</h3>
 			</div>

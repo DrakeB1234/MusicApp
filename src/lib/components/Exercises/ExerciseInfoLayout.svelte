@@ -34,7 +34,11 @@
 			All Exercises
 		</a>
 		<div class="exercise-data">
-			<CardIconWrapper url={exerciseEntry.iconUrl} title={exerciseEntry.title} />
+			<CardIconWrapper
+				url={exerciseEntry.iconUrl}
+				title={exerciseEntry.title}
+				backgroundColor={exerciseEntry.color}
+			/>
 			<div class="exercise-text">
 				<h1 class="body-regular">{exerciseEntry.title}</h1>
 				<p class="body-small text-light">{exerciseEntry.description}</p>

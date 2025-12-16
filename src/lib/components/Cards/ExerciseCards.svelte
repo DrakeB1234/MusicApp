@@ -12,7 +12,7 @@
 	<h2 class="body-regular">Exercises</h2>
 	{#each fixedExerciseData as data (data.id)}
 		<a href="/exercises/{data.exerciseUrl}" class="reset link-card-item">
-			<CardIconWrapper url={data.iconUrl} title={data.title} />
+			<CardIconWrapper url={data.iconUrl} title={data.title} backgroundColor={data.color} />
 			<div class="card-text">
 				<h3 class="body-regular">{data.title}</h3>
 				<p class="body-small text-light">{data.description}</p>

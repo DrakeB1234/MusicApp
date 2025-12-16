@@ -21,20 +21,24 @@ export type ExerciseParams = {
 export type ExercisePresetConfig = {
   allowedChords: string[];
   timeToGuess: number;
+  buttonInputCount: number;
 }
 
 export const exercisePresetParams: Record<difficulty, ExercisePresetConfig> = {
   easy: {
     allowedChords: ["maj", "min"],
-    timeToGuess: 10
+    timeToGuess: 10,
+    buttonInputCount: 3,
   },
   medium: {
     allowedChords: ["maj", "min", "maj7", "min7"],
-    timeToGuess: 8
+    timeToGuess: 8,
+    buttonInputCount: 4,
   },
   hard: {
     allowedChords: ["h", "q", "e"],
-    timeToGuess: 6
+    timeToGuess: 6,
+    buttonInputCount: 4,
   },
 }
 
@@ -50,6 +54,8 @@ export class ChordGuesserExercise {
   score = $state(0);
   correct = $state(0);
   incorrectChord = $state("");
+
+  buttonChordStrings: string[] = $state([]);
 
   private isGameOver = $state(false);
   private currentExerciseParam: ExercisePresetConfig;
@@ -89,14 +95,34 @@ export class ChordGuesserExercise {
     }, 1000);
   }
 
-  private handleIncorrect() {
+  private handleIncorrect(chord: string) {
     sfxAudioService.play("wrong");
     this.triesComponent?.decrementTries();
     this.timedFunctionComponent!.stop();
+    this.incorrectChord = chord;
 
     setTimeout(() => {
       this.start();
     }, 1000);
+  }
+
+  private addChordStringsToButtonInput() {
+    const correctIdx = Math.round(Math.random() * (this.currentExerciseParam.buttonInputCount - 1));
+    const strings = [];
+    for (let i = 0; i < this.currentExerciseParam.buttonInputCount; i++) {
+      if (i === correctIdx) {
+        strings.push(this.currentChord.string);
+      }
+      else {
+        const randomChordIdx = Math.round(Math.random() * (this.currentExerciseParam.allowedChords.length - 1));
+        const randomNoteNameIdx = Math.round(Math.random() * (NATURAL_NOTE_NAMES.length - 1));
+        const noteName = NATURAL_NOTE_NAMES[randomNoteNameIdx];
+        const chordString = this.currentExerciseParam.allowedChords[randomChordIdx];
+        strings.push(noteName + chordString);
+      };
+    }
+
+    this.buttonChordStrings = strings;
   }
 
   handleMidiInput = (message: MidiMessage) => {
@@ -112,13 +138,15 @@ export class ChordGuesserExercise {
     this.attemptedInput = true;
     if (typeof chord === "string") {
       if (chord === this.currentChord.string) this.handleCorrect();
-      else this.handleIncorrect();
+      else this.handleIncorrect(chord);
     }
     // Otherwise 'chord' is a array
     else {
       const chordString = notesToChordString(chord);
+      if (!chordString) return;
+
       if (chordString === this.currentChord.string) this.handleCorrect();
-      else this.handleIncorrect();
+      else this.handleIncorrect(chordString);
     }
   }
 
@@ -126,6 +154,8 @@ export class ChordGuesserExercise {
     if (this.isGameOver || !this.triesComponent || !this.timedFunctionComponent) return;
     this.attemptedInput = false;
     this.currentChord = this.generateNewChord();
+
+    this.addChordStringsToButtonInput();
 
     this.staffRenderer!.clearAllNotes();
     this.staffRenderer!.drawChord(this.currentChord.notes.map(e => noteToVectorScoreString(e)));
@@ -139,7 +169,7 @@ export class ChordGuesserExercise {
     this.isListeningInput = false;
 
     if (!this.attemptedInput) {
-      this.handleIncorrect();
+      this.handleIncorrect(this.currentChord.string);
     }
   }
 
