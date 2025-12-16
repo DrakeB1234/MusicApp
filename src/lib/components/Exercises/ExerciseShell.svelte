@@ -1,6 +1,7 @@
 <script lang="ts">
 	import ExitIcon from '$lib/components/Icons/ExitIcon.svelte';
 	import type { Snippet } from 'svelte';
+	import MidiDeviceConnect from '../MidiDeviceConnect.svelte';
 
 	type Stat = {
 		label: string;
@@ -11,12 +12,14 @@
 		onExit,
 		stats,
 		viewport,
-		controls
+		controls,
+		showMidiDevice = false
 	}: {
 		onExit: () => void;
 		stats: Stat[];
 		viewport: Snippet;
 		controls?: Snippet;
+		showMidiDevice?: boolean;
 	} = $props();
 </script>
 
@@ -40,6 +43,11 @@
 		</div>
 
 		{#if controls}
+			{#if showMidiDevice}
+				<div class="midi-device-container">
+					<MidiDeviceConnect />
+				</div>
+			{/if}
 			<div class="game-inputs">
 				{@render controls()}
 			</div>
@@ -69,6 +77,10 @@
 		border-bottom: 1px solid var(--color-border);
 		display: flex;
 		justify-content: center;
+	}
+
+	.midi-device-container {
+		padding: var(--space-2);
 	}
 
 	.game-inputs {

@@ -56,11 +56,12 @@
 </script>
 
 <ExerciseShell
+	showMidiDevice
 	onExit={handleExitPressed}
 	stats={[
 		{ value: game.score, label: 'Score' },
 		{ value: game.correct, label: 'Correct' },
-		{ value: game.triesString, label: 'Tries' }
+		{ value: game.triesLeft, label: 'Tries' }
 	]}
 >
 	{#snippet viewport()}
@@ -75,7 +76,7 @@
 		{:else}
 			<div class="game-container">
 				<div class="countdown-container">
-					<p class="ui-large bold">{game.timeLeftString}</p>
+					<p class="ui-large bold">{game.timeLeft}</p>
 				</div>
 				<div use:setupStaff class="staff-container"></div>
 			</div>
@@ -86,9 +87,8 @@
 			<ExerciseGeneralInput
 				buttonValues={game.buttonChordStrings}
 				handleButtonPressed={game.handleInput}
-				disableInputs={!isStart}
+				disableInputs={!game.isListeningInput}
 			/>
-			<p>{midiService.isDeviceConnected}</p>
 		</div>
 	{/snippet}
 </ExerciseShell>

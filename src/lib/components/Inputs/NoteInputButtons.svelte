@@ -1,10 +1,7 @@
 <script lang="ts">
 	import { NATURAL_NOTE_NAMES, type Note } from '$lib/helpers/notehelpers';
 
-	let {
-		handleNotePressed,
-		incorrectNote
-	}: { handleNotePressed: (note: Note) => void; incorrectNote?: Note | null } = $props();
+	let { handleNotePressed }: { handleNotePressed: (note: Note) => void } = $props();
 
 	const ActiveAccidental = Object.freeze({
 		SHARP: '#',
@@ -26,15 +23,6 @@
 		};
 		handleNotePressed(note);
 	}
-
-	$effect(() => {
-		if (incorrectNote) {
-			const timer = setTimeout(() => {
-				incorrectNote = null;
-			}, 500);
-			return () => clearTimeout(timer);
-		}
-	});
 </script>
 
 <div class="input-buttons-wrapper">
@@ -52,11 +40,7 @@
 	</div>
 	<div class="note-buttons">
 		{#each NATURAL_NOTE_NAMES as name}
-			<button
-				class="secondary"
-				onclick={() => handleNoteNamePressed(name)}
-				class:incorrect={incorrectNote?.name === name}>{name}</button
-			>
+			<button class="secondary" onclick={() => handleNoteNamePressed(name)}>{name}</button>
 		{/each}
 	</div>
 </div>
@@ -74,9 +58,5 @@
 		gap: var(--space-2);
 		justify-content: center;
 		transition: var(--transition-color);
-	}
-	.incorrect {
-		color: var(--color-on-error);
-		background-color: var(--color-error) !important;
 	}
 </style>

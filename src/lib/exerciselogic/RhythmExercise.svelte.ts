@@ -15,11 +15,6 @@ export type ExercisePresetConfig = {
   allowedRests: string[];
 }
 
-type TimeStampEntry = {
-  timeStamp: number;
-  note: string;
-}
-
 export const exercisePresetParams: Record<difficulty, ExercisePresetConfig> = {
   easy: {
     allowedNoteDurations: ["w", "h", "q"],
@@ -53,19 +48,30 @@ const BEATS_PER_BAR = 4;
 const testTapTimestamps = [0, 325, 750, 1075, 1500, 1825, 2250, 2575];
 
 export class RhythmExercise {
-  private staffRenderer: RhythmStaff | null = null;
-
+  private staffRendererInstance: RhythmStaff | null = null;
   private triesComponentInstance: TriesComponent | null;
   private timedFunctionComponentInstance: TimedFunctionComponent | null;
 
-  score = $state(0);
-  correct = $state(0);
-  private isListeningInput: boolean = false;
-  private inputData: number[] = [];
-  private currentStartCount: number = $state(0);
-  private isGameOver = $state(false);
   private currentExerciseParam: ExercisePresetConfig;
-  private timeStampEntries: TimeStampEntry[] = $state([]);
+  private inputData: number[] = [];
+  private timeStampEntries: number[] = [];
+
+  // UI State (variables that will be accessed outside of this class, so getters are made to ensure only instance can change these)
+  private _score = $state(0);
+  private _correct = $state(0);
+  private _isListeningInput: boolean = $state(false);
+  private _currentStartTime: number = $state(0);
+  private _isGameOver = $state(false);
+  private _currentNoteStrings: string[] = $state([]);
+
+  get triesLeft(): number { return this.triesComponentInstance!.triesLeftCount };
+  get score(): number { return this._score };
+  get correct(): number { return this._correct };
+  get currentNoteStrings(): string[] { return this._currentNoteStrings };
+  get currentStartTime(): string {
+    if (this._currentStartTime === 0) return "-";
+    return String(this._currentStartTime);
+  }
 
   constructor(difficulty: string) {
     let exercisePresetParam = exercisePresetParams[difficulty as difficulty];
@@ -77,13 +83,13 @@ export class RhythmExercise {
   }
 
   private handleTriesOut = () => {
-    this.isGameOver = true;
+    this._isGameOver = true;
     this.timedFunctionComponentInstance?.stop();
   }
 
   private generateTimeStamps() {
+    let generatedNoteStrings: string[] = [];
     this.timeStampEntries = [];
-
     let currentAccumulatedBeats = 0;
 
     for (let b = 0; b < BARS_COUNT; b++) {
@@ -103,25 +109,19 @@ export class RhythmExercise {
         const randomNoteKey = validNotes[Math.floor(Math.random() * validNotes.length)];
         const noteBeatValue = noteValuesMap[randomNoteKey];
 
-        this.timeStampEntries.push({
-          timeStamp: currentAccumulatedBeats,
-          note: randomNoteKey
-        });
+        this.timeStampEntries.push(currentAccumulatedBeats);
+        generatedNoteStrings.push(randomNoteKey);
 
         currentAccumulatedBeats += noteBeatValue * BPM_MS;
 
         beatsInCurrentBar += noteBeatValue;
       }
     }
-  }
 
-  setRenderer = (renderer: RhythmStaff) => {
-    if (this.staffRenderer) return;
-    this.staffRenderer = renderer;
+    this._currentNoteStrings = generatedNoteStrings;
   }
 
   private validateInput(listeningStartTime: number) {
-
     let pass = true;
     if (this.inputData.length !== this.timeStampEntries.length) {
       pass = false;
@@ -129,10 +129,10 @@ export class RhythmExercise {
     else {
       this.inputData.forEach((e, i) => {
         const inputTimestamp = e - listeningStartTime;
-        const difference = inputTimestamp - this.timeStampEntries[i].timeStamp;
+        const difference = inputTimestamp - this.timeStampEntries[i];
 
         if (difference > TAP_THRESHOLD_MS || difference < 0) {
-          pass = false
+          pass = false;
         }
       });
     }
@@ -142,7 +142,7 @@ export class RhythmExercise {
 
   private handleCorrect() {
     sfxAudioService.play("correct");
-    this.correct++;
+    this._correct++;
 
     setTimeout(() => {
       this.start();
@@ -162,22 +162,26 @@ export class RhythmExercise {
     this.inputData = [];
   }
 
+  setRenderer = (renderer: RhythmStaff) => {
+    if (this.staffRendererInstance) return;
+    this.staffRendererInstance = renderer;
+  }
+
   async start() {
-    if (this.isGameOver || !this.timedFunctionComponentInstance || !this.triesComponentInstance) return;
+    if (this._isGameOver || !this.timedFunctionComponentInstance || !this.triesComponentInstance) return;
 
     this.generateTimeStamps();
-    const noteStrings = this.timeStampEntries.map(e => e.note);
-    const staffData = rhythmStringToVectorScoreData(noteStrings);
+    const staffData = rhythmStringToVectorScoreData(this._currentNoteStrings);
 
-    this.staffRenderer!.clearAllNotes();
+    this.staffRendererInstance!.clearAllNotes();
     staffData.forEach(noteGroup => {
       // If sub arr is all 'e' notes, draw a beamed note
       if (noteGroup.length > 1 && noteGroup.every(note => note === "e")) {
-        this.staffRenderer!.drawBeamedNotes("e", noteGroup.length);
+        this.staffRendererInstance!.drawBeamedNotes("e", noteGroup.length);
       }
       // else, draw regular notes
       else {
-        this.staffRenderer!.drawNote(noteGroup);
+        this.staffRendererInstance!.drawNote(noteGroup);
       }
     });
 
@@ -185,18 +189,18 @@ export class RhythmExercise {
     const inputIterationCount = BARS_COUNT * BEATS_PER_BAR + 1;
 
     // Starts inital countdown
-    this.currentStartCount = startIterationCount;
+    this._currentStartTime = startIterationCount;
     await this.timedFunctionComponentInstance.startAndWait(startIterationCount, BPM_MS, () => {
-      this.currentStartCount--;
-      if (this.currentStartCount <= 0) return;
-      if (this.currentStartCount === 4) sfxAudioService.play("clickUp");
+      this._currentStartTime--;
+      if (this._currentStartTime <= 0) return;
+      if (this._currentStartTime === 4) sfxAudioService.play("clickUp");
       else sfxAudioService.play("clickDown");
     });
 
     // Starts input listener
     if (!this.timedFunctionComponentInstance) return;
     this.cleanInput();
-    this.isListeningInput = true;
+    this._isListeningInput = true;
     let listeningStartTime = Date.now();
 
     let currentInputCount = inputIterationCount;
@@ -205,46 +209,32 @@ export class RhythmExercise {
       if (currentInputCount <= 0) return;
       if (currentInputCount % 4 === 0) sfxAudioService.play("clickUp");
       else sfxAudioService.play("clickDown");
-      this.staffRenderer!.incrementCurrentBeatUI();
+      this.staffRendererInstance!.incrementCurrentBeatUI();
     });
-    this.isListeningInput = false;
-    this.staffRenderer!.resetCurrentBeatUI();
+    this._isListeningInput = false;
+    this.staffRendererInstance!.resetCurrentBeatUI();
 
     this.validateInput(listeningStartTime);
   }
 
   handleInput = () => {
-    if (this.isGameOver || !this.isListeningInput) return;
+    if (this._isGameOver || !this._isListeningInput) return;
     const timestamp = Date.now();
     this.inputData.push(timestamp);
   }
 
   reset = () => {
-    if (!this.isGameOver) return;
+    if (!this._isGameOver) return;
 
     this.timedFunctionComponentInstance?.stop();
     this.triesComponentInstance?.resetTries();
     this.cleanInput();
-    this.currentStartCount = 0;
-    this.isGameOver = false;
+    this._currentStartTime = 0;
+    this._isGameOver = false;
 
     this.start();
 
     return;
-  }
-
-  get triesString(): string {
-    if (!this.triesComponentInstance) return "";
-    return String(this.triesComponentInstance.triesLeftCount);
-  }
-
-  get currentStartTimeCount(): string {
-    if (this.currentStartCount === 0) return "-";
-    return String(this.currentStartCount);
-  }
-
-  get currentNoteStrings(): string[] {
-    return this.timeStampEntries.map(e => e.note);
   }
 
   destroy() {

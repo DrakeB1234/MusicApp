@@ -4,8 +4,16 @@
 
 	import favicon from '$lib/assets/favicon.svg';
 	import '../app.css';
+	import { onMount } from 'svelte';
 
 	let { children } = $props();
+
+	onMount(async () => {
+		if (dev) {
+			const eruda = (await import('eruda')).default;
+			eruda.init();
+		}
+	});
 </script>
 
 <svelte:head>
@@ -13,7 +21,7 @@
 </svelte:head>
 
 {#if dev}
-	<RenderScan />
+	<!-- <RenderScan /> -->
 {/if}
 
 {@render children()}

@@ -52,19 +52,19 @@
 	onExit={handleExitPressed}
 	stats={[
 		{ value: game.score, label: 'Score' },
-		{ value: game.correctNotesPlayedString, label: 'Correct' },
-		{ value: game.timeLeftString, label: 'Time Left' }
+		{ value: game.correctAndTotalNotes, label: 'Correct' },
+		{ value: game.timeLeft, label: 'Time Left' }
 	]}
 >
 	{#snippet viewport()}
-		{#if !game.gameOverState}
+		{#if !game.isGameOver}
 			<div use:setupStaff class="staff-container"></div>
 		{:else}
 			<ExerciseGameOver message="Times Up!" continuePressed={handleExitPressed} />
 		{/if}
 	{/snippet}
 	{#snippet controls()}
-		<NoteInputButtons handleNotePressed={game.handleNoteInput} incorrectNote={game.incorrectNote} />
+		<NoteInputButtons handleNotePressed={game.handleNoteInput} />
 	{/snippet}
 </ExerciseShell>
 

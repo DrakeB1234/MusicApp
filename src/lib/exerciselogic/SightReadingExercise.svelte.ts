@@ -88,49 +88,54 @@ const CONSECUTIVE_CORRECT_COUNT = 3;
 const CONSECUTIVE_CORRECT_TIME_BONUS = 2;
 
 export class SightreadingExercise {
-  private staffRenderer: MusicStaff | null = null;
+  private staffRendererInstance: MusicStaff | null = null;
+  private timerComponentInstance: TimerComponent | null;
 
-  score = $state(0);
-  incorrectNote: Note | null = $state(null);
-  private timer: TimerComponent | null;
+  private consecutiveCorrectNotes: number = 0;
+  private minSemitone: number;
+  private maxSemitone: number;
+  private currentExerciseParam: ExercisePresetConfig;
+
+  // UI State (variables that will be accessed outside of this class, so getters are made to ensure only instance can change these)
+  private _score = $state(0);
   private currentNote: Note = { name: "C", octave: 4, accidental: null };
-
-  private isGameOver = $state(false);
+  private _isGameOver = $state(false);
   private correctNotesPlayed: number = 0;
   private totalNotesPlayed: number = $state(0);
 
-  private consecutiveCorrectNotes: number = $state(0);
-
-  private minSemitone: number;
-  private maxSemitone: number;
-
-  private staffClefType: string;
-  private currentExerciseParam: ExercisePresetConfig;
+  get score(): number { return this._score };
+  get isGameOver(): boolean { return this._isGameOver };
+  get timeLeft(): string {
+    if (!this.timerComponentInstance) return "";
+    const str = this.timerComponentInstance.formatTime();
+    return str;
+  }
+  get correctAndTotalNotes(): string {
+    return `${this.correctNotesPlayed} / ${this.totalNotesPlayed}`;
+  }
 
   constructor(difficulty: string, clef: string) {
     let exercisePresetParam = exercisePresetParams[difficulty as difficulty];
     if (!exercisePresetParam) exercisePresetParam = exercisePresetParams.easy;
     this.currentExerciseParam = exercisePresetParam as ExercisePresetConfig;
-    this.staffClefType = clef;
 
     this.minSemitone = noteToAbsoluteSemitone(this.currentExerciseParam.noteRanges[clef].min);
     this.maxSemitone = noteToAbsoluteSemitone(this.currentExerciseParam.noteRanges[clef].max);
 
     this.currentNote = this.generateNewNote();
-    this.timer = new TimerComponent(this.currentExerciseParam.timer, this.handleTimeout);
-    this.timer.start();
+    this.timerComponentInstance = new TimerComponent(this.currentExerciseParam.timer, this.handleTimeout);
+    this.timerComponentInstance.start();
   }
 
   private handleDrawNoteOnStaff(note: Note) {
-    if (!this.staffRenderer) return;
+    if (!this.staffRendererInstance) return;
 
-    this.staffRenderer.changeNoteByIndex(noteToVectorScoreString(note), 0);
-    this.staffRenderer.justifyNotes();
+    this.staffRendererInstance.changeNoteByIndex(noteToVectorScoreString(note), 0);
+    this.staffRendererInstance.justifyNotes();
   }
 
   private handleTimeout = () => {
-    this.isGameOver = true;
-    console.log("GAME OVER");
+    this._isGameOver = true;
   }
 
   private handleCorrectNote(note: Note) {
@@ -138,7 +143,7 @@ export class SightreadingExercise {
     pianoAudioService.playNote(note);
 
     if (this.consecutiveCorrectNotes >= CONSECUTIVE_CORRECT_COUNT) {
-      this.timer?.addTime(CONSECUTIVE_CORRECT_TIME_BONUS);
+      this.timerComponentInstance?.addTime(CONSECUTIVE_CORRECT_TIME_BONUS);
       this.consecutiveCorrectNotes = 0;
     }
     else {
@@ -158,19 +163,18 @@ export class SightreadingExercise {
     this.consecutiveCorrectNotes = 0;
 
     sfxAudioService.play("wrong");
-    this.incorrectNote = note;
   }
 
   setRenderer(renderer: MusicStaff) {
-    if (this.staffRenderer) return;
-    this.staffRenderer = renderer;
+    if (this.staffRendererInstance) return;
+    this.staffRendererInstance = renderer;
     const vsNoteStr = noteToVectorScoreString(this.currentNote);
-    this.staffRenderer.drawNote(vsNoteStr);
-    this.staffRenderer.justifyNotes();
+    this.staffRendererInstance.drawNote(vsNoteStr);
+    this.staffRendererInstance.justifyNotes();
   }
 
   handleMidiInput = (message: MidiMessage) => {
-    if (this.isGameOver) return;
+    if (this._isGameOver) return;
     if (message.type === "noteOn" && message.attackType === "single") {
       this.handleNoteInput(message.notes[0]);
     }
@@ -180,7 +184,7 @@ export class SightreadingExercise {
   }
 
   handleNoteInput = (note: Note) => {
-    if (this.isGameOver) return;
+    if (this._isGameOver) return;
     const tempCurrentNote = { ...this.currentNote };
 
     if (!note.octave) {
@@ -192,28 +196,10 @@ export class SightreadingExercise {
   }
 
   destroy() {
-    if (!this.timer) return;
-    this.timer.stop();
-    this.timer = null;
-    this.staffRenderer = null;
-  }
-
-  get timeLeftString(): string {
-    if (!this.timer) return "";
-    const str = this.timer.formatTime();
-    return str;
-  }
-
-  get correctNotesPlayedString(): string {
-    return `${this.correctNotesPlayed} / ${this.totalNotesPlayed}`;
-  }
-
-  get currentNoteString(): string {
-    return noteToString(this.currentNote);
-  }
-
-  get gameOverState(): boolean {
-    return this.isGameOver;
+    if (!this.timerComponentInstance) return;
+    this.timerComponentInstance.stop();
+    this.timerComponentInstance = null;
+    this.staffRendererInstance = null;
   }
 
   generateNewNote(): Note {

@@ -48,7 +48,7 @@
 	stats={[
 		{ value: game.score, label: 'Score' },
 		{ value: game.correct, label: 'Correct' },
-		{ value: game.triesString, label: 'Tries' }
+		{ value: game.triesLeft, label: 'Tries' }
 	]}
 >
 	{#snippet viewport()}
@@ -63,7 +63,7 @@
 		{:else}
 			<div class="game-container">
 				<div class="countdown-container">
-					<p class="ui-large bold">{game.currentStartTimeCount}</p>
+					<p class="ui-large bold">{game.currentStartTime}</p>
 				</div>
 				<div use:setupStaff class="staff-container"></div>
 			</div>

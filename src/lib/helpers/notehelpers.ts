@@ -101,36 +101,43 @@ export function noteToVectorScoreString(note: Note): string {
 }
 
 export function rhythmStringToVectorScoreData(notes: string[]): string[][] {
-  const result: string[][] = [];
-  let currentGroup: string[] = [];
-  let consecutiveEGroup: string[] = [];
+  if (notes.length === 0) return [];
 
-  for (let i = 0; i < notes.length; i++) {
-    const note = notes[i];
+  // Group consecutive identical notes, regardless of value q's together, e's together...
+  const rawGroups: string[][] = [];
+  let currentBatch: string[] = [notes[0]];
 
-    if (note === 'e' && consecutiveEGroup.length < 4) {
-      if (currentGroup.length > 0) {
-        result.push(currentGroup);
-        currentGroup = [];
-      }
-
-      consecutiveEGroup.push(note);
-
+  for (let i = 1; i < notes.length; i++) {
+    if (notes[i] === notes[i - 1]) {
+      currentBatch.push(notes[i]);
     } else {
-      if (consecutiveEGroup.length > 0) {
-        result.push(consecutiveEGroup);
-        consecutiveEGroup = [];
-      }
+      rawGroups.push(currentBatch);
+      currentBatch = [notes[i]];
+    }
+  }
+  rawGroups.push(currentBatch);
 
-      currentGroup.push(note);
+  // Merge non-beam groups, if isBeam push accumulated notes into result, then push beam. Accumlation only occurs to non-beam groups
+  // which are defined as any group that is not 'e' and less than 1 in size. (qqq) = not beam (e) = not beam (ee) = beam
+  const result: string[][] = [];
+  let accumulation: string[] = [];
+
+  for (const group of rawGroups) {
+    const isBeam = group[0] === 'e' && group.length > 1;
+
+    if (isBeam) {
+      if (accumulation.length > 0) {
+        result.push(accumulation);
+        accumulation = [];
+      }
+      result.push(group);
+    } else {
+      accumulation.push(...group);
     }
   }
 
-  if (consecutiveEGroup.length > 0) {
-    result.push(consecutiveEGroup);
-    consecutiveEGroup = [];
-  } else if (currentGroup.length > 0) {
-    result.push(currentGroup);
+  if (accumulation.length > 0) {
+    result.push(accumulation);
   }
 
   return result;
