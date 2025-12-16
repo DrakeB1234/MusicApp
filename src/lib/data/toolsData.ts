@@ -17,8 +17,8 @@ export const toolsData: ToolsDataEntry[] = [
   {
     id: "cb56bb8d-59b1-451b-8b98-b79547a1b162",
     color: "var(--color-primary-light)",
-    url: "scales-creator",
-    title: "Scales Creator",
+    url: "scales-viewer",
+    title: "Scales Viewer",
     iconUrl: "icons/ScalesIcon.svg",
   },
   {

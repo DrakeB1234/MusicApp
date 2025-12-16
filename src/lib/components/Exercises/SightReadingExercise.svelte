@@ -49,6 +49,7 @@
 </script>
 
 <ExerciseShell
+	showMidiDevice
 	onExit={handleExitPressed}
 	stats={[
 		{ value: game.score, label: 'Score' },
@@ -64,7 +65,9 @@
 		{/if}
 	{/snippet}
 	{#snippet controls()}
-		<NoteInputButtons handleNotePressed={game.handleNoteInput} />
+		<div class="inputs">
+			<NoteInputButtons handleNotePressed={game.handleNoteInput} />
+		</div>
 	{/snippet}
 </ExerciseShell>
 
@@ -72,5 +75,9 @@
 	.staff-container {
 		width: fit-content;
 		margin-inline: auto;
+	}
+	.inputs {
+		padding: var(--space-2);
+		padding-bottom: var(--space-5);
 	}
 </style>

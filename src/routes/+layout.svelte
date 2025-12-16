@@ -8,12 +8,12 @@
 
 	let { children } = $props();
 
-	onMount(async () => {
-		if (dev) {
-			const eruda = (await import('eruda')).default;
-			eruda.init();
-		}
-	});
+	// onMount(async () => {
+	// 	if (dev) {
+	// 		const eruda = (await import('eruda')).default;
+	// 		eruda.init();
+	// 	}
+	// });
 </script>
 
 <svelte:head>
@@ -21,7 +21,7 @@
 </svelte:head>
 
 {#if dev}
-	<!-- <RenderScan /> -->
+	<RenderScan />
 {/if}
 
 {@render children()}

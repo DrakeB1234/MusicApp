@@ -44,6 +44,8 @@ const TAP_THRESHOLD_MS = 175;
 const BARS_COUNT = 2;
 const BEATS_PER_BAR = 4;
 
+const WAIT_TIME_AFTER_TRY_MS = 1000;
+
 // const testTapTimestamps = [0, 750, 1500, 2250];
 const testTapTimestamps = [0, 325, 750, 1075, 1500, 1825, 2250, 2575];
 
@@ -68,6 +70,7 @@ export class RhythmExercise {
   get score(): number { return this._score };
   get correct(): number { return this._correct };
   get currentNoteStrings(): string[] { return this._currentNoteStrings };
+  get isListeningInput(): boolean { return this._isListeningInput };
   get currentStartTime(): string {
     if (this._currentStartTime === 0) return "-";
     return String(this._currentStartTime);
@@ -146,7 +149,7 @@ export class RhythmExercise {
 
     setTimeout(() => {
       this.start();
-    }, 1000);
+    }, WAIT_TIME_AFTER_TRY_MS);
   }
 
   private handleIncorrect() {
@@ -155,7 +158,7 @@ export class RhythmExercise {
 
     setTimeout(() => {
       this.start();
-    }, 1000);
+    }, WAIT_TIME_AFTER_TRY_MS);
   }
 
   private cleanInput() {

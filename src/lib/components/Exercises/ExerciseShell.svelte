@@ -44,13 +44,11 @@
 
 		{#if controls}
 			{#if showMidiDevice}
-				<div class="midi-device-container">
+				<div class="device-connect">
 					<MidiDeviceConnect />
 				</div>
 			{/if}
-			<div class="game-inputs">
-				{@render controls()}
-			</div>
+			{@render controls()}
 		{/if}
 	</div>
 </main>
@@ -63,14 +61,12 @@
 		padding: var(--space-3) var(--space-4);
 		border-bottom: 1px solid var(--color-border);
 	}
-
 	.information-entry:nth-child(2) {
 		text-align: center;
 	}
 	.information-entry:last-child {
 		text-align: end;
 	}
-
 	.game-viewport {
 		padding-block: var(--space-4);
 		background-color: var(--color-background);
@@ -78,12 +74,7 @@
 		display: flex;
 		justify-content: center;
 	}
-
-	.midi-device-container {
+	.device-connect {
 		padding: var(--space-2);
-	}
-
-	.game-inputs {
-		padding-block: var(--space-4);
 	}
 </style>

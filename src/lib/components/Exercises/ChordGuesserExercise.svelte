@@ -8,6 +8,7 @@
 	import { midiService } from '$lib/midiservice/midiService.svelte';
 	import ExerciseGeneralInput from '../Inputs/ExerciseGeneralInput.svelte';
 	import { pianoAudioService } from '$lib/audio/pianoAudioService.svelte';
+	import MidiDeviceConnect from '../MidiDeviceConnect.svelte';
 
 	const { handleExitPressed, params }: { handleExitPressed: () => void; params: string } = $props();
 
@@ -108,10 +109,8 @@
 		background-color: var(--color-primary);
 	}
 	.input {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: var(--space-4);
+		padding: var(--space-2);
+		padding-bottom: var(--space-5);
 	}
 	.game-container {
 		display: block;

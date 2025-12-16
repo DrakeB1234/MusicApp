@@ -71,10 +71,9 @@
 	{/snippet}
 	{#snippet controls()}
 		<div class="input">
-			<button class="secondary custom" disabled={!isStart} onclick={game.handleInput}
+			<button class="secondary custom" disabled={!game.isListeningInput} onclick={game.handleInput}
 				>TAP HERE</button
 			>
-			<button class="secondary custom" onclick={game.reset}>reset</button>
 		</div>
 	{/snippet}
 </ExerciseShell>
@@ -98,6 +97,8 @@
 		flex-direction: column;
 		align-items: center;
 		gap: var(--space-4);
+		padding: var(--space-4);
+		padding-bottom: var(--space-5);
 	}
 	.game-container {
 		display: block;

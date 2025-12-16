@@ -52,6 +52,8 @@ const TRIES_COUNT = 3;
 // Represents 1/8 chance
 const ACCIDENTAL_CHANCE = 8;
 
+const WAIT_TIME_AFTER_TRY_MS = 2000;
+
 export class ChordGuesserExercise {
   private staffRendererInstance: MusicStaff | null = null;
   private triesComponentInstance: TriesComponent | null;
@@ -117,7 +119,7 @@ export class ChordGuesserExercise {
 
     setTimeout(() => {
       this.start();
-    }, 1000);
+    }, WAIT_TIME_AFTER_TRY_MS);
   }
 
   private handleIncorrect() {
@@ -127,7 +129,7 @@ export class ChordGuesserExercise {
 
     setTimeout(() => {
       this.start();
-    }, 1000);
+    }, WAIT_TIME_AFTER_TRY_MS);
   }
 
   private addChordStringsToButtonInput() {
