@@ -7,11 +7,11 @@ export default defineConfig({
 	plugins: [
 		sveltekit(),
 		basicSsl(),
-		process.env.NODE_ENV === 'production' && visualizer({
-			open: true,
-			filename: 'stats/chunk-analysis.html',
-			gzipSize: true,
-			brotliSize: true,
-		}),
-	].filter(Boolean),
+		// process.env.NODE_ENV === 'production' && visualizer({
+		// 	open: true,
+		// 	filename: 'stats/chunk-analysis.html',
+		// 	gzipSize: true,
+		// 	brotliSize: true,
+		// }),
+	],
 });

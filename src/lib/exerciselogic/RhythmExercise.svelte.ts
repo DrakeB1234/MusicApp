@@ -55,8 +55,8 @@ const testTapTimestamps = [0, 325, 750, 1075, 1500, 1825, 2250, 2575];
 export class RhythmExercise {
   private staffRenderer: RhythmStaff | null = null;
 
-  private triesComponent: TriesComponent | null;
-  private timedFunctionComponent: TimedFunctionComponent | null;
+  private triesComponentInstance: TriesComponent | null;
+  private timedFunctionComponentInstance: TimedFunctionComponent | null;
 
   score = $state(0);
   correct = $state(0);
@@ -72,13 +72,13 @@ export class RhythmExercise {
     if (!exercisePresetParam) exercisePresetParam = exercisePresetParams.easy;
     this.currentExerciseParam = exercisePresetParam as ExercisePresetConfig;
 
-    this.triesComponent = new TriesComponent(TRIES_COUNT, this.handleTriesOut);
-    this.timedFunctionComponent = new TimedFunctionComponent();
+    this.triesComponentInstance = new TriesComponent(TRIES_COUNT, this.handleTriesOut);
+    this.timedFunctionComponentInstance = new TimedFunctionComponent();
   }
 
   private handleTriesOut = () => {
     this.isGameOver = true;
-    this.timedFunctionComponent?.stop();
+    this.timedFunctionComponentInstance?.stop();
   }
 
   private generateTimeStamps() {
@@ -151,7 +151,7 @@ export class RhythmExercise {
 
   private handleIncorrect() {
     sfxAudioService.play("wrong");
-    this.triesComponent?.decrementTries();
+    this.triesComponentInstance?.decrementTries();
 
     setTimeout(() => {
       this.start();
@@ -163,7 +163,7 @@ export class RhythmExercise {
   }
 
   async start() {
-    if (this.isGameOver || !this.timedFunctionComponent || !this.triesComponent) return;
+    if (this.isGameOver || !this.timedFunctionComponentInstance || !this.triesComponentInstance) return;
 
     this.generateTimeStamps();
     const noteStrings = this.timeStampEntries.map(e => e.note);
@@ -186,7 +186,7 @@ export class RhythmExercise {
 
     // Starts inital countdown
     this.currentStartCount = startIterationCount;
-    await this.timedFunctionComponent.startAndWait(startIterationCount, BPM_MS, () => {
+    await this.timedFunctionComponentInstance.startAndWait(startIterationCount, BPM_MS, () => {
       this.currentStartCount--;
       if (this.currentStartCount <= 0) return;
       if (this.currentStartCount === 4) sfxAudioService.play("clickUp");
@@ -194,13 +194,13 @@ export class RhythmExercise {
     });
 
     // Starts input listener
-    if (!this.timedFunctionComponent) return;
+    if (!this.timedFunctionComponentInstance) return;
     this.cleanInput();
     this.isListeningInput = true;
     let listeningStartTime = Date.now();
 
     let currentInputCount = inputIterationCount;
-    await this.timedFunctionComponent.startAndWait(inputIterationCount, BPM_MS, () => {
+    await this.timedFunctionComponentInstance.startAndWait(inputIterationCount, BPM_MS, () => {
       currentInputCount--;
       if (currentInputCount <= 0) return;
       if (currentInputCount % 4 === 0) sfxAudioService.play("clickUp");
@@ -222,8 +222,8 @@ export class RhythmExercise {
   reset = () => {
     if (!this.isGameOver) return;
 
-    this.timedFunctionComponent?.stop();
-    this.triesComponent?.resetTries();
+    this.timedFunctionComponentInstance?.stop();
+    this.triesComponentInstance?.resetTries();
     this.cleanInput();
     this.currentStartCount = 0;
     this.isGameOver = false;
@@ -234,8 +234,8 @@ export class RhythmExercise {
   }
 
   get triesString(): string {
-    if (!this.triesComponent) return "";
-    return String(this.triesComponent.triesLeftCount);
+    if (!this.triesComponentInstance) return "";
+    return String(this.triesComponentInstance.triesLeftCount);
   }
 
   get currentStartTimeCount(): string {
@@ -248,10 +248,10 @@ export class RhythmExercise {
   }
 
   destroy() {
-    if (this.triesComponent) this.triesComponent = null;
-    if (this.timedFunctionComponent) {
-      this.timedFunctionComponent.stop();
-      this.timedFunctionComponent = null;
+    if (this.triesComponentInstance) this.triesComponentInstance = null;
+    if (this.timedFunctionComponentInstance) {
+      this.timedFunctionComponentInstance.stop();
+      this.timedFunctionComponentInstance = null;
     }
   }
 }

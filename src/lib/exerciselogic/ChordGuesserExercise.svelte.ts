@@ -6,6 +6,7 @@ import { NATURAL_NOTE_NAMES, noteToString, noteToVectorScoreString, rhythmString
 import type { MidiMessage } from "$lib/midiservice/midiService.svelte";
 import { chordStringToNotes, notesToChordString } from "$lib/helpers/chordHelpers";
 import { pianoAudioService } from "$lib/audio/pianoAudioService.svelte";
+import { shuffleArray } from "$lib/helpers/helpers";
 
 type difficulty = "easy" | "medium" | "hard";
 
@@ -22,27 +23,34 @@ export type ExercisePresetConfig = {
   allowedChords: string[];
   timeToGuess: number;
   buttonInputCount: number;
+  allowedAccidentals: string[] | null;
 }
 
 export const exercisePresetParams: Record<difficulty, ExercisePresetConfig> = {
   easy: {
-    allowedChords: ["maj", "min"],
+    allowedChords: ["maj", "min", "maj7"],
     timeToGuess: 10,
     buttonInputCount: 3,
+    allowedAccidentals: null
   },
   medium: {
     allowedChords: ["maj", "min", "maj7", "min7"],
     timeToGuess: 8,
     buttonInputCount: 4,
+    allowedAccidentals: ["#"]
   },
   hard: {
-    allowedChords: ["h", "q", "e"],
+    allowedChords: ["maj", "min", "maj7", "min7", "dim", "sus2"],
     timeToGuess: 6,
     buttonInputCount: 4,
+    allowedAccidentals: ["#", "b"]
   },
 }
 
 const TRIES_COUNT = 3;
+
+// Represents 1/8 chance
+const ACCIDENTAL_CHANCE = 8;
 
 export class ChordGuesserExercise {
   private staffRenderer: MusicStaff | null = null;
@@ -53,15 +61,13 @@ export class ChordGuesserExercise {
 
   score = $state(0);
   correct = $state(0);
-  incorrectChord = $state("");
-
   buttonChordStrings: string[] = $state([]);
 
   private isGameOver = $state(false);
   private currentExerciseParam: ExercisePresetConfig;
 
   private attemptedInput: boolean = false;
-  private isListeningInput: boolean = false;
+  private isListeningInput: boolean = $state(false);
   private timeLeft: number = $state(0);
 
   constructor(difficulty: string) {
@@ -80,9 +86,22 @@ export class ChordGuesserExercise {
     this.timeLeft = 0;
   }
 
-  setRenderer = (renderer: MusicStaff) => {
-    if (this.staffRenderer) return;
-    this.staffRenderer = renderer;
+  private generateRandomChordString(): string {
+    const randomNoteIdx = Math.floor(Math.random() * NATURAL_NOTE_NAMES.length);
+    let root = NATURAL_NOTE_NAMES[randomNoteIdx];
+
+    let accidental = "";
+    if (this.currentExerciseParam.allowedAccidentals) {
+      const randomChance = Math.floor(Math.random() * ACCIDENTAL_CHANCE) + 1;
+      const randomAccidentalIdx = Math.floor(Math.random() * this.currentExerciseParam.allowedAccidentals.length);
+      if (randomChance === ACCIDENTAL_CHANCE) accidental = this.currentExerciseParam.allowedAccidentals[randomAccidentalIdx];
+    }
+    root += accidental;
+
+    const randomTypeIdx = Math.floor(Math.random() * this.currentExerciseParam.allowedChords.length);
+    const chordSuffix = this.currentExerciseParam.allowedChords[randomTypeIdx];
+
+    return root + chordSuffix;
   }
 
   private handleCorrect() {
@@ -95,11 +114,10 @@ export class ChordGuesserExercise {
     }, 1000);
   }
 
-  private handleIncorrect(chord: string) {
+  private handleIncorrect() {
     sfxAudioService.play("wrong");
     this.triesComponent?.decrementTries();
     this.timedFunctionComponent!.stop();
-    this.incorrectChord = chord;
 
     setTimeout(() => {
       this.start();
@@ -107,22 +125,20 @@ export class ChordGuesserExercise {
   }
 
   private addChordStringsToButtonInput() {
-    const correctIdx = Math.round(Math.random() * (this.currentExerciseParam.buttonInputCount - 1));
-    const strings = [];
-    for (let i = 0; i < this.currentExerciseParam.buttonInputCount; i++) {
-      if (i === correctIdx) {
-        strings.push(this.currentChord.string);
-      }
-      else {
-        const randomChordIdx = Math.round(Math.random() * (this.currentExerciseParam.allowedChords.length - 1));
-        const randomNoteNameIdx = Math.round(Math.random() * (NATURAL_NOTE_NAMES.length - 1));
-        const noteName = NATURAL_NOTE_NAMES[randomNoteNameIdx];
-        const chordString = this.currentExerciseParam.allowedChords[randomChordIdx];
-        strings.push(noteName + chordString);
-      };
-    }
+    const options = new Set<string>();
+    options.add(this.currentChord.string);
 
-    this.buttonChordStrings = strings;
+    while (options.size < this.currentExerciseParam.buttonInputCount) {
+      const randomWrongChord = this.generateRandomChordString();
+      options.add(randomWrongChord);
+    };
+
+    this.buttonChordStrings = shuffleArray(Array.from(options));
+  }
+
+  setRenderer = (renderer: MusicStaff) => {
+    if (this.staffRenderer) return;
+    this.staffRenderer = renderer;
   }
 
   handleMidiInput = (message: MidiMessage) => {
@@ -138,7 +154,7 @@ export class ChordGuesserExercise {
     this.attemptedInput = true;
     if (typeof chord === "string") {
       if (chord === this.currentChord.string) this.handleCorrect();
-      else this.handleIncorrect(chord);
+      else this.handleIncorrect();
     }
     // Otherwise 'chord' is a array
     else {
@@ -146,7 +162,7 @@ export class ChordGuesserExercise {
       if (!chordString) return;
 
       if (chordString === this.currentChord.string) this.handleCorrect();
-      else this.handleIncorrect(chordString);
+      else this.handleIncorrect();
     }
   }
 
@@ -159,6 +175,7 @@ export class ChordGuesserExercise {
 
     this.staffRenderer!.clearAllNotes();
     this.staffRenderer!.drawChord(this.currentChord.notes.map(e => noteToVectorScoreString(e)));
+    this.staffRenderer!.justifyNotes();
 
     this.isListeningInput = true;
     this.timeLeft = this.currentExerciseParam.timeToGuess;
@@ -169,7 +186,7 @@ export class ChordGuesserExercise {
     this.isListeningInput = false;
 
     if (!this.attemptedInput) {
-      this.handleIncorrect(this.currentChord.string);
+      this.handleIncorrect();
     }
   }
 
@@ -184,17 +201,11 @@ export class ChordGuesserExercise {
   }
 
   generateNewChord(): CurrentChord {
-    const randomRootIdx = Math.round(Math.random() * (NATURAL_NOTE_NAMES.length - 1));
-    const randomRoot = NATURAL_NOTE_NAMES[randomRootIdx];
+    const randomChord = this.generateRandomChordString();
 
-    const randomChordIdx = Math.round(Math.random() * (this.currentExerciseParam.allowedChords.length - 1));
-    const randomChordString = this.currentExerciseParam.allowedChords[randomChordIdx];
-
-    const fullChordString = randomRoot + randomChordString;
-
-    const randomChordNotes = chordStringToNotes(fullChordString, 4);
+    const randomChordNotes = chordStringToNotes(randomChord, 4);
     return {
-      string: fullChordString,
+      string: randomChord,
       notes: randomChordNotes
     };
   }

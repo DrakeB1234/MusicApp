@@ -86,7 +86,6 @@
 			<ExerciseGeneralInput
 				buttonValues={game.buttonChordStrings}
 				handleButtonPressed={game.handleInput}
-				incorrectValue={game.incorrectChord}
 				disableInputs={!isStart}
 			/>
 			<p>{midiService.isDeviceConnected}</p>

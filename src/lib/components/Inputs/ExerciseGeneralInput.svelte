@@ -2,33 +2,19 @@
 	let {
 		buttonValues,
 		handleButtonPressed,
-		incorrectValue,
 		disableInputs
 	}: {
 		buttonValues: any[];
 		handleButtonPressed: (value: any) => void;
-		incorrectValue?: any | null;
 		disableInputs: boolean;
 	} = $props();
-
-	$effect(() => {
-		if (incorrectValue) {
-			const timer = setTimeout(() => {
-				incorrectValue = null;
-			}, 500);
-			return () => clearTimeout(timer);
-		}
-	});
 </script>
 
 <div class="input-buttons-wrapper">
 	<div class="buttons">
 		{#each buttonValues as value}
-			<button
-				class="secondary"
-				onclick={() => handleButtonPressed(value)}
-				class:incorrect={incorrectValue === value}
-				disabled={disableInputs}>{value}</button
+			<button class="secondary" onclick={() => handleButtonPressed(value)} disabled={disableInputs}
+				>{value}</button
 			>
 		{/each}
 	</div>
