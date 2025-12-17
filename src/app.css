@@ -180,6 +180,7 @@ button {
   padding: var(--space-2) var(--space-4);
   cursor: pointer;
   color: var(--color-font);
+  font-size: var(--font-size-base);
 }
 
 button.primary {
@@ -249,6 +250,7 @@ button.on-background:hover {
 /* INPUTS */
 input {
   color: var(--color-font);
+  font-size: var(--font-size-base);
 }
 
 input[type="number"]::-webkit-outer-spin-button,
@@ -306,6 +308,7 @@ p {
 }
 
 .body-regular {
+  font-size: var(--font-size-base);
   line-height: 1.5;
 }
 

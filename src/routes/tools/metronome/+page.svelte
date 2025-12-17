@@ -80,7 +80,7 @@
 			</ul>
 
 			<div class="bpm-container">
-				<SliderInput min={MIN_BPM} max={MAX_BPM} label="BPM" bind:value={bpmValue} />
+				<SliderInput min={MIN_BPM} max={MAX_BPM} step={5} label="BPM" bind:value={bpmValue} />
 			</div>
 
 			<div class="action-buttons">

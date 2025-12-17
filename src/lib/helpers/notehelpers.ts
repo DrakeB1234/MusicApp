@@ -7,7 +7,6 @@ export type Note = {
 
 export const NATURAL_NOTE_NAMES = ["C", "D", "E", "F", "G", "A", "B"];
 export const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-
 export const NATURAL_NOTE_SEMITONE_OFFSETS: Record<string, number> = {
   C: 0,
   D: 2,
@@ -17,6 +16,8 @@ export const NATURAL_NOTE_SEMITONE_OFFSETS: Record<string, number> = {
   A: 9,
   B: 11
 };
+
+const REGEX_NOTE_STRING = /(?<name>[a-gA-G])(?<accidental>[#b]?)(?<octave>[0-9])/;
 
 export function midiSemitoneToNote(semitone: number): Note {
   // MIDI maps C4 = 60, which should be 48
@@ -98,6 +99,22 @@ export function noteToVectorScoreString(note: Note): string {
   str += note.duration ?? "w";
 
   return str
+}
+
+export function stringToNote(note: string): Note | null {
+  const match = note.match(REGEX_NOTE_STRING);
+
+  if (!match || !match.groups) {
+    return null;
+  }
+
+  const { _, name, accidental, octave } = match.groups;
+
+  return {
+    name: name,
+    accidental: accidental ?? null,
+    octave: Number(octave)
+  };
 }
 
 export function rhythmStringToVectorScoreData(notes: string[]): string[][] {
