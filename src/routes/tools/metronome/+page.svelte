@@ -2,7 +2,7 @@
 	import { MAX_BPM, MIN_BPM, sfxAudioService } from '$lib/audio/sfxAudioService.svelte';
 	import StartStopIcon from '$lib/components/Icons/StartStopIcon.svelte';
 	import Navbar from '$lib/components/Navbar.svelte';
-	import SliderInput from '$lib/components/SliderInput.svelte';
+	import SliderInput from '$lib/components/Inputs/SliderInput.svelte';
 	import Wrapper from '$lib/components/Wrapper.svelte';
 	import { onMount } from 'svelte';
 
@@ -100,7 +100,6 @@
 						<label for="beats" class="body-regular">Beats</label>
 						<input
 							id="beats"
-							class="default"
 							type="number"
 							min="1"
 							max="9"

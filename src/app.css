@@ -45,7 +45,6 @@ a {
   --palette-white: #ffffff;
   --palette-grey-50: #f0f1f5;
   --palette-grey-100: #e9ebf1;
-  --palette-grey-150: #e1e4ec;
   --palette-grey-200: #c7ccd6;
   --palette-grey-300: #a3a9b8;
   --palette-grey-400: #848da0;
@@ -70,11 +69,13 @@ a {
 :root {
   --system-ui: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 
-  --font-size-small: 0.825rem;
-  --font-size-base: 1rem;
-  --font-size-large: 1.125rem;
-  --font-size-xlarge: 1.5rem;
-  --font-size-2xlarge: 5rem;
+
+  /* CHANGE TO NAMING font-size-16 for 16px -> 1rem */
+  --font-size-12: 0.825rem;
+  --font-size-16: 1rem;
+  --font-size-20: 1.25rem;
+  --font-size-40: 2.5rem;
+  --font-size-80: 5rem;
 
   --font-width-1: 40ch;
   --font-width-2: 60ch;
@@ -99,12 +100,12 @@ a {
   --color-primary-dark: var(--palette-blue-600);
   --color-on-primary: var(--palette-white);
 
-  --color-background: var(--palette-grey-100);
+  --color-background: var(--palette-grey-50);
   --color-background-dark: var(--palette-grey-200);
   --color-on-background: var(--palette-grey-800);
 
-  --color-surface: var(--palette-grey-50);
-  --color-surface-dark: var(--palette-grey-150);
+  --color-surface: var(--palette-white);
+  --color-surface-dark: var(--palette-grey-50);
   --color-surface-xdark: var(--palette-grey-200);
   --color-on-surface: var(--palette-grey-800);
 
@@ -128,9 +129,6 @@ a {
 
   --max-width-1: 1200px;
   --max-width-2: 1000px;
-
-  --icon-size-1: 20;
-  --icon-size-2: 32;
 }
 
 body {
@@ -175,12 +173,33 @@ a.button-text:hover {
 }
 
 /* BUTTONS */
+.button-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  width: fit-content;
+}
+
+.button-group>button:not(:last-child) {
+  border-right: 1px solid var(--color-border);
+}
+
+.button-group>button:nth-child(n) {
+  border-radius: unset;
+  background-color: transparent;
+  flex: 1;
+}
 
 button {
   padding: var(--space-2) var(--space-4);
   cursor: pointer;
   color: var(--color-font);
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-16);
+  width: fit-content;
 }
 
 button.primary {
@@ -193,6 +212,10 @@ button.primary {
 
 button.primary:hover {
   background-color: var(--color-primary-dark);
+}
+
+button.primary:disabled {
+  background-color: var(--color-surface-xdark);
 }
 
 button.secondary {
@@ -248,9 +271,10 @@ button.on-background:hover {
 }
 
 /* INPUTS */
-input {
+input,
+select {
   color: var(--color-font);
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-16);
 }
 
 input[type="number"]::-webkit-outer-spin-button,
@@ -259,7 +283,6 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 input[type="number"] {
-  padding: var(--space-4);
   appearance: textfield;
 }
 
@@ -269,11 +292,21 @@ input.reset {
   padding: var(--space-1);
 }
 
-input.default {
+input[type="number"],
+input[type="text"] {
   padding: var(--space-2) var(--space-3);
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
+}
+
+select {
+  cursor: pointer;
+  background: var(--color-surface);
+  border-radius: var(--space-2);
+  padding: var(--space-2) var(--space-2);
+  border: 1px solid var(--color-border);
+  transition: var(--transition-color);
 }
 
 /* Font Classes */
@@ -281,7 +314,7 @@ h1,
 h2,
 h3,
 p {
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-16);
   font-weight: 400;
   line-height: 1.4;
   color: var(--color-font);
@@ -289,31 +322,31 @@ p {
 }
 
 .ui-xlarge {
-  font-size: var(--font-size-2xlarge);
+  font-size: var(--font-size-80);
   line-height: 1;
 }
 
 .ui-large {
-  font-size: var(--font-size-xlarge);
+  font-size: var(--font-size-40);
   line-height: 1;
 }
 
 .header-large {
-  font-size: var(--font-size-xlarge);
+  font-size: var(--font-size-48);
   line-height: 1;
 }
 
 .body-large {
-  font-size: var(--font-size-large);
+  font-size: var(--font-size-20);
 }
 
 .body-regular {
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-16);
   line-height: 1.5;
 }
 
 .body-small {
-  font-size: var(--font-size-small);
+  font-size: var(--font-size-12);
   line-height: 1.5;
 }
 

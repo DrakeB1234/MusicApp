@@ -33,8 +33,4 @@
 		justify-content: center;
 		transition: var(--transition-color);
 	}
-	.incorrect {
-		color: var(--color-on-error);
-		background-color: var(--color-error) !important;
-	}
 </style>

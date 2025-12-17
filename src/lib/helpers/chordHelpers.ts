@@ -32,6 +32,17 @@ export const CHORD_QUALITIES: Record<string, number[]> = {
   "minadd9": [0, 3, 7, 14]
 };
 
+// 12th semitone is for getting the 8th degree C4 -> C5
+export const SCALE_INTERVALS: Record<string, number[]> = {
+  "Major": [0, 2, 4, 5, 7, 9, 11, 12],
+  "Minor": [0, 2, 3, 5, 7, 8, 10, 12],
+  "Lydian": [0, 2, 4, 6, 7, 9, 11, 12],
+  "Mixolydian": [0, 2, 4, 5, 7, 9, 10, 12],
+  "Dorian": [0, 2, 3, 5, 7, 9, 10, 12],
+  "Phrygian": [0, 1, 3, 5, 7, 8, 10, 12],
+  "Locrian": [0, 1, 3, 5, 6, 8, 10, 12],
+};
+
 // Note corresponds to the amount of sharps (+) or flats (-) in the given key
 const CIRCLE_OF_FIFTHS_POS: Record<string, number> = {
   "C": 0,
@@ -111,4 +122,30 @@ export function notesToChordString(notes: Note[]): string | null {
   }
 
   return null;
+}
+
+export function getScaleNotes(root: string, scaleType: string, rootOctave: number = 4): Note[] {
+  const intervals = SCALE_INTERVALS[scaleType];
+
+  if (!intervals || !scaleType) {
+    throw new Error(`Unknown scale type: ${scaleType}`);
+  }
+
+  const preferFlats = getPreferFlatsByEnharmonicPreference(root, scaleType);
+
+  const match = root.match(/^([a-gA-G])([b#]?)$/);
+  if (!match) throw new Error(`Invalid root note: ${root}`);
+
+  const [_, step, accidental] = match;
+  const rootNote: Note = {
+    name: step.toUpperCase(),
+    octave: rootOctave,
+    accidental: accidental || null,
+  };
+
+  const rootSemitone = noteToAbsoluteSemitone(rootNote);
+
+  return intervals.map(interval => {
+    return absoluteSemitoneToNote(rootSemitone + interval, preferFlats);
+  });
 }

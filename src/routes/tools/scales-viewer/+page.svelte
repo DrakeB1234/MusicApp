@@ -1,70 +1,102 @@
 <script lang="ts">
 	import { pianoAudioService } from '$lib/audio/pianoAudioService.svelte';
+	import StartStopIcon from '$lib/components/Icons/StartStopIcon.svelte';
+	import SelectInput from '$lib/components/Inputs/SelectInput.svelte';
+	import ToggleButtonGroup from '$lib/components/Inputs/ToggleButtonGroup.svelte';
 	import Navbar from '$lib/components/Navbar.svelte';
 	import Wrapper from '$lib/components/Wrapper.svelte';
-	import { stringToNote, type Note } from '$lib/helpers/notehelpers';
-	import { onMount } from 'svelte';
+	import { getScaleNotes, SCALE_INTERVALS } from '$lib/helpers/chordHelpers';
+	import { NATURAL_NOTE_NAMES, noteToVectorScoreString, type Note } from '$lib/helpers/notehelpers';
+	import { onDestroy, onMount } from 'svelte';
 	import { MusicStaff } from 'vector-score';
 
-	let staff: MusicStaff | null = null;
+	let staffInstance: MusicStaff | null = null;
+	let currentScaleNoteObjs: Note[] = [];
 
-	// const testScaleNotes: string[] = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'c5'];
-	const testScaleNotes: string[] = ['D4', 'E4', 'F#4', 'G4', 'A4', 'B4', 'C#5', 'D5'];
+	let currentPlayedNoteIdx: number | null = $state(null);
+	let currentScaleButtonNotes: string[] = $state([]);
+	let selectedKey: string = $state('C');
+	let selectedScale: string = $state('Major');
+	let selectedAccidental: string = $state('n');
+
+	let selectKeyRoot: string = $derived(
+		selectedKey + (selectedAccidental !== 'n' ? selectedAccidental : '')
+	);
 
 	const playScaleDelayMS = 500;
-	let playScaleInterval: ReturnType<typeof setInterval> | null = null;
+	let playScaleInterval: ReturnType<typeof setInterval> | null = $state(null);
 
 	onMount(() => {
 		pianoAudioService.init();
+
+		// Init scale with new notes
+		handleInputChange();
+	});
+
+	onDestroy(() => {
+		if (playScaleInterval) {
+			clearInterval(playScaleInterval);
+			playScaleInterval = null;
+		}
+		Howler.stop();
 	});
 
 	function setupStaff(node: HTMLElement) {
-		if (staff) return;
-		staff = new MusicStaff(node, {
+		if (staffInstance) return;
+		staffInstance = new MusicStaff(node, {
 			staffType: 'treble',
-			width: 280,
+			width: 320,
 			scale: 1.4,
 			spaceAbove: 2,
 			spaceBelow: 1,
 			staffColor: 'var(--color-font)',
 			staffBackgroundColor: 'var(--color-surface)'
 		});
-
-		staff.drawNote(testScaleNotes);
 	}
 
-	function handleNoteButtonPressed(note: string) {
-		const noteObj = stringToNote(note);
-		if (!noteObj) return;
+	function handleNoteButtonPressed(noteObjIndex: number) {
+		if (noteObjIndex > currentScaleNoteObjs.length || noteObjIndex < 0) return;
 
-		pianoAudioService.playNote(noteObj);
+		pianoAudioService.playNote(currentScaleNoteObjs[noteObjIndex]);
 	}
 
 	function handlePlayAllPressed() {
 		if (playScaleInterval) {
 			clearInterval(playScaleInterval);
 			playScaleInterval = null;
+			currentPlayedNoteIdx = null;
 		}
 
-		let noteObjs: Note[] = [];
+		if (currentScaleNoteObjs.length < 1) return;
 
-		testScaleNotes.forEach((e) => {
-			const newNote = stringToNote(e);
-			if (newNote) noteObjs.push(newNote);
-		});
+		playScaleInterval = setInterval(() => {
+			if (currentPlayedNoteIdx === null) currentPlayedNoteIdx = 0;
 
-		if (noteObjs.length > 1) {
-			let currentNoteIdx = 0;
-			playScaleInterval = setInterval(() => {
-				if (currentNoteIdx >= noteObjs.length) {
-					clearInterval(playScaleInterval!);
-					playScaleInterval = null;
-					return;
-				}
+			if (currentPlayedNoteIdx >= currentScaleNoteObjs.length) {
+				clearInterval(playScaleInterval!);
+				playScaleInterval = null;
+				currentPlayedNoteIdx = null;
+				return;
+			}
 
-				pianoAudioService.playNote(noteObjs[currentNoteIdx]);
-				currentNoteIdx++;
-			}, playScaleDelayMS);
+			pianoAudioService.playNote(currentScaleNoteObjs[currentPlayedNoteIdx]);
+			currentPlayedNoteIdx++;
+		}, playScaleDelayMS);
+	}
+
+	function handleInputChange() {
+		const scaleNotes = getScaleNotes(selectKeyRoot, selectedScale);
+
+		if (scaleNotes) {
+			currentScaleButtonNotes = scaleNotes.map((e) => e.name + (e.accidental ?? ''));
+			currentScaleNoteObjs = scaleNotes;
+
+			if (staffInstance) {
+				const vectorScoreNotes = scaleNotes.map((e) => noteToVectorScoreString(e));
+				staffInstance.clearAllNotes();
+				staffInstance.drawNote(vectorScoreNotes);
+				staffInstance.justifyNotes();
+			}
 		}
 	}
 </script>
@@ -73,21 +105,55 @@
 <Wrapper maxWidth="var(--max-width-2)">
 	<main>
 		<div class="card">
-			<div use:setupStaff class="staff-container"></div>
-			<div class="note-wrapper">
-				<div class="note-item">
-					<h2 class="body-regular">Notes in Scale Cmaj</h2>
-				</div>
-				<div class="note-buttons-container">
-					{#each testScaleNotes as note}
-						<button class="text on-background bold" onclick={() => handleNoteButtonPressed(note)}
-							>{note}</button
+			<div class="top-container">
+				<h2 class="body-large bold">{selectKeyRoot} {selectedScale} Scale</h2>
+				<button
+					class="primary icon-container play-button"
+					onclick={handlePlayAllPressed}
+					disabled={playScaleInterval !== null}
+					><StartStopIcon color="var(--color-on-primary)" /></button
+				>
+				<div class="button-group">
+					{#each currentScaleButtonNotes as note, i}
+						<button
+							class="text body-small"
+							onclick={() => handleNoteButtonPressed(i)}
+							class:active={currentPlayedNoteIdx === i + 1}>{note}</button
 						>
 					{/each}
 				</div>
-				<div class="note-item">
-					<button class="primary" onclick={handlePlayAllPressed}>Play All</button>
+			</div>
+
+			<div class="staff-container">
+				<div use:setupStaff></div>
+			</div>
+
+			<div class="bottom-container">
+				<div class="inputs">
+					<SelectInput
+						label="Key"
+						id="key"
+						optionValues={NATURAL_NOTE_NAMES}
+						bind:value={selectedKey}
+						onChange={handleInputChange}
+					/>
+					<SelectInput
+						label="Scale"
+						id="scale"
+						optionValues={Object.keys(SCALE_INTERVALS)}
+						bind:value={selectedScale}
+						onChange={handleInputChange}
+					/>
 				</div>
+				<ToggleButtonGroup
+					buttons={[
+						{ text: '♮', value: 'n' },
+						{ text: '#', value: '#' },
+						{ text: 'b', value: 'b' }
+					]}
+					bind:value={selectedAccidental}
+					onChange={handleInputChange}
+				/>
 			</div>
 		</div>
 	</main>
@@ -95,41 +161,46 @@
 
 <style>
 	main {
-		padding-block: var(--space-4);
+		padding: var(--space-4);
 	}
-	.card {
-		padding: var(--space-4) var(--space-2);
-		padding-top: 0;
+	.top-container {
+		padding: var(--space-5) var(--space-4);
 	}
+	.top-container > button.play-button {
+		margin-top: var(--space-2);
+		padding: var(--space-1);
+	}
+	.top-container > .button-group {
+		margin-top: var(--space-4);
+	}
+	.top-container > .button-group > button {
+		min-width: 5ch;
+	}
+	.top-container > .button-group > button.active {
+		background-color: var(--color-success);
+		color: var(--color-on-success);
+	}
+
 	.staff-container {
-		width: fit-content;
-		margin-inline: auto;
-	}
-	.note-wrapper {
 		display: flex;
-		flex-direction: column;
-		max-width: 450px;
-		margin-inline: auto;
-		border: 1px solid var(--color-border);
-		padding-block: var(--space-4);
-	}
-	.note-buttons-container {
-		display: flex;
-		flex-wrap: wrap;
-		gap: var(--space-2);
+		justify-content: center;
 		background-color: var(--color-background);
-		padding: var(--space-4) var(--space-2);
 		border-block: 1px solid var(--color-border);
 	}
-	.note-item {
-		display: flex;
+	.staff-container > div {
 		padding-inline: var(--space-4);
+		background-color: var(--color-surface);
 	}
-	.note-item > h2 {
-		margin-bottom: var(--space-4);
+
+	.bottom-container {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-4);
+		padding: var(--space-5) var(--space-4);
 	}
-	.note-item > button {
-		margin-top: var(--space-4);
-		margin-left: auto;
+	.bottom-container > .inputs {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-4);
 	}
 </style>

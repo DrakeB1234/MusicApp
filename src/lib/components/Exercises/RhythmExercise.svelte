@@ -55,7 +55,7 @@
 		{#if !isStart}
 			<div class="start-container">
 				<p class="body-large">When ready, press start!</p>
-				<button class="primary icon-container custom" onclick={handleStart}>
+				<button class="primary icon-container start" onclick={handleStart}>
 					<StartStopIcon color="var(--color-on-primary)" />
 					Start
 				</button>
@@ -71,8 +71,8 @@
 	{/snippet}
 	{#snippet controls()}
 		<div class="input">
-			<button class="secondary custom" disabled={!game.isListeningInput} onclick={game.handleInput}
-				>TAP HERE</button
+			<button class="secondary tap" disabled={!game.isListeningInput} onclick={game.handleInput}
+				>TAP</button
 			>
 		</div>
 	{/snippet}
@@ -85,11 +85,18 @@
 		gap: var(--space-4);
 		padding: var(--space-4);
 	}
-	button.custom {
-		padding: var(--space-4) var(--space-6);
-		transition: none;
+	button.start {
+		padding: var(--space-4) var(--space-5);
+		font-size: var(--font-size-20);
 	}
-	button.custom:active {
+	button.tap {
+		width: 100%;
+		max-width: 120px;
+		padding: var(--space-4) var(--space-5);
+		transition: none;
+		font-size: var(--font-size-20);
+	}
+	button.tap:active {
 		background-color: var(--color-primary);
 	}
 	.input {
@@ -98,7 +105,6 @@
 		align-items: center;
 		gap: var(--space-4);
 		padding: var(--space-4);
-		padding-bottom: var(--space-5);
 	}
 	.game-container {
 		display: block;

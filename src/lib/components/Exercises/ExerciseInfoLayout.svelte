@@ -47,11 +47,11 @@
 		<div class="stats">
 			<div class="stat-entry">
 				<p class="body-small">Total Points</p>
-				<p class="body-large bold">4301</p>
+				<p class="body-regular bold">4301</p>
 			</div>
 			<div class="stat-entry">
 				<p class="body-small">Attempts</p>
-				<p class="body-large bold">8</p>
+				<p class="body-regular bold">8</p>
 			</div>
 		</div>
 		<div class="inputs">

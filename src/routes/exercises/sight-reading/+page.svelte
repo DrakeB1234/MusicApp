@@ -2,7 +2,7 @@
 	import ExerciseInfoLayout from '$lib/components/Exercises/ExerciseInfoLayout.svelte';
 	import SightReadingExercise from '../../../lib/components/Exercises/SightReadingExercise.svelte';
 	import SettingsIcon from '$lib/components/Icons/SettingsIcon.svelte';
-	import ToggleButtonGroup from '$lib/components/ToggleButtonGroup.svelte';
+	import ToggleButtonGroup from '$lib/components/Inputs/ToggleButtonGroup.svelte';
 	import Wrapper from '$lib/components/Wrapper.svelte';
 	import { exercisesData } from '$lib/data/exercisesData';
 	import type { ExerciseParams } from '$lib/exerciselogic/SightReadingExercise.svelte';

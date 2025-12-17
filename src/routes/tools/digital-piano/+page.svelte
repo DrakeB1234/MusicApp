@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { pianoAudioService } from '$lib/audio/pianoAudioService.svelte';
 	import Navbar from '$lib/components/Navbar.svelte';
-	import PianoRoll from '$lib/components/PianoRoll.svelte';
+	import PianoRoll from '$lib/components/Inputs/PianoRoll.svelte';
 	import Wrapper from '$lib/components/Wrapper.svelte';
 	import { onMount } from 'svelte';
 
