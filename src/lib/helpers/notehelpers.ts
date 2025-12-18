@@ -5,6 +5,11 @@ export type Note = {
   duration?: string
 }
 
+export type VectorScoreRhythmData = {
+  type: 'note' | 'rest' | 'beam';
+  notes: string[];
+};
+
 export const NATURAL_NOTE_NAMES = ["C", "D", "E", "F", "G", "A", "B"];
 export const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 export const NATURAL_NOTE_SEMITONE_OFFSETS: Record<string, number> = {
@@ -117,10 +122,13 @@ export function stringToNote(note: string): Note | null {
   };
 }
 
-export function rhythmStringToVectorScoreData(notes: string[]): string[][] {
+// notehelpers.ts
+
+// ... (existing imports and exports)
+
+export function rhythmStringToVectorScoreData(notes: string[]): VectorScoreRhythmData[] {
   if (notes.length === 0) return [];
 
-  // Group consecutive identical notes, regardless of value q's together, e's together...
   const rawGroups: string[][] = [];
   let currentBatch: string[] = [notes[0]];
 
@@ -134,28 +142,43 @@ export function rhythmStringToVectorScoreData(notes: string[]): string[][] {
   }
   rawGroups.push(currentBatch);
 
-  // Merge non-beam groups, if isBeam push accumulated notes into result, then push beam. Accumlation only occurs to non-beam groups
-  // which are defined as any group that is not 'e' and less than 1 in size. (qqq) = not beam (e) = not beam (ee) = beam
-  const result: string[][] = [];
+  // Merging different types of notes to draw
+  // normal (q, h, q) beamed (e,e,e,e) rests (rq, rq, rq, rq)
+  const result: VectorScoreRhythmData[] = [];
   let accumulation: string[] = [];
+  let currentType: 'note' | 'rest' | null = null;
+
+  const flushAccumulation = () => {
+    if (accumulation.length > 0 && currentType) {
+      result.push({ type: currentType, notes: accumulation });
+    }
+    accumulation = [];
+    currentType = null;
+  };
 
   for (const group of rawGroups) {
-    const isBeam = group[0] === 'e' && group.length > 1;
+    const isRest = group[0].startsWith('r');
+    const isBeam = (group[0] === 'e' || group[0] === 's') && group.length > 1;
 
     if (isBeam) {
-      if (accumulation.length > 0) {
-        result.push(accumulation);
-        accumulation = [];
-      }
-      result.push(group);
-    } else {
-      accumulation.push(...group);
+      flushAccumulation();
+      result.push({ type: 'beam', notes: group });
+      continue;
     }
+
+    const type = isRest ? 'rest' : 'note';
+
+    if (currentType && currentType !== type) {
+      flushAccumulation();
+    }
+
+    currentType = type;
+
+    // Converts 'rq' -> 'q' for vectorScore
+    accumulation.push(...(isRest ? group.map(n => n.slice(1)) : group));
   }
 
-  if (accumulation.length > 0) {
-    result.push(accumulation);
-  }
+  flushAccumulation();
 
   return result;
 }

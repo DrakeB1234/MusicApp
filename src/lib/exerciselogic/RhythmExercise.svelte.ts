@@ -16,14 +16,13 @@ export type ExercisePresetConfig = {
 
 export const exercisePresetParams: Record<difficulty, ExercisePresetConfig> = {
   easy: {
-    // durationBarPatterns: [['q', 'q', 'q', 'q'], ['q', 'h', 'q'], ['h', 'q', 'q'], ['w'], ['q', 'q', 'h'], ['h', 'h'], ['q', 'rq', 'q', 'rq']],
-    durationBarPatterns: [['q', 'q', 'q', 'q'], ['h', 'h'], ['q', 'rq', 'q', 'rq']],
+    durationBarPatterns: [['q', 'q', 'q', 'q'], ['q', 'h', 'q'], ['h', 'q', 'q'], ['w'], ['q', 'q', 'h'], ['h', 'h'], ['q', 'rq', 'q', 'rq'], ['h', 'rq', 'rq', 'q'], ['q', 'rq', 'h'], ['rq', 'rq', 'q', 'q']],
   },
   medium: {
-    durationBarPatterns: [['e', 'e', 'q', 'h'], ['h', 'e', 'e', 'e', 'e'], ['q', 'h', 'e', 'e'], ['q', 'q', 'q', 'q'], ['e', 'e', 'e', 'e', 'h'], ['q', 'e', 'e', 'q', 'q']],
+    durationBarPatterns: [['e', 'e', 'q', 'h'], ['h', 'e', 'e', 'e', 'e'], ['q', 'h', 'e', 'e'], ['q', 'q', 'q', 'q'], ['e', 'e', 'e', 'e', 'h'], ['q', 'e', 'e', 'q', 'q'], ['e', 'e', 'rq', 'q', 'q'], ['rh', 'e', 'e', 'e', 'e'], ['h', 'q', 'rq'], ['h', 'rh']],
   },
   hard: {
-    durationBarPatterns: [['q', 'q', 'q', 'q']],
+    durationBarPatterns: [['q', 'q', 'q', 'q'], ['h', 'h']],
   },
 }
 
@@ -104,10 +103,13 @@ export class RhythmExercise {
       const selectedPattern = possiblePatterns[randomIndex];
 
       for (const noteKey of selectedPattern) {
-        this.timeStampEntries.push(currentAccumulatedTime);
         generatedNoteStrings.push(noteKey);
-
         const beatValue = noteValuesMap[noteKey];
+
+        if (!noteKey.startsWith('r')) {
+          this.timeStampEntries.push(currentAccumulatedTime);
+        }
+
         currentAccumulatedTime += beatValue * BPM_MS;
       }
     }
@@ -168,14 +170,17 @@ export class RhythmExercise {
     this.staffRendererInstance!.clearAllNotes();
     const staffData = rhythmStringToVectorScoreData(this._currentNoteStrings);
 
-    staffData.forEach(noteGroup => {
-      // If sub arr is all 'e' notes, draw a beamed note
-      if (noteGroup.length > 1 && noteGroup.every(note => note === "e")) {
-        this.staffRendererInstance!.drawBeamedNotes("e", noteGroup.length);
-      }
-      // else, draw regular notes
-      else {
-        this.staffRendererInstance!.drawNote(noteGroup);
+    staffData.forEach((group) => {
+      switch (group.type) {
+        case 'beam':
+          this.staffRendererInstance!.drawBeamedNotes(group.notes[0] as "e" | "s", group.notes.length);
+          break;
+        case 'rest':
+          this.staffRendererInstance!.drawRest(group.notes);
+          break;
+        case 'note':
+          this.staffRendererInstance!.drawNote(group.notes);
+          break;
       }
     });
 
