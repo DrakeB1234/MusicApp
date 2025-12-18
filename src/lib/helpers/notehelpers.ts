@@ -122,10 +122,6 @@ export function stringToNote(note: string): Note | null {
   };
 }
 
-// notehelpers.ts
-
-// ... (existing imports and exports)
-
 export function rhythmStringToVectorScoreData(notes: string[]): VectorScoreRhythmData[] {
   if (notes.length === 0) return [];
 

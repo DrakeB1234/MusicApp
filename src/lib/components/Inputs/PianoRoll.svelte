@@ -1,81 +1,113 @@
 <script lang="ts">
-	import { MAX_OCTAVE, MIN_OCTAVE, pianoAudioService } from '$lib/audio/pianoAudioService.svelte';
+	import { pianoAudioService } from '$lib/audio/pianoAudioService.svelte';
 	import { NATURAL_NOTE_NAMES } from '$lib/helpers/notehelpers';
+	import { onMount } from 'svelte';
 
-	const WHITE_W = 40;
-	const WHITE_H = 120;
-	const BLACK_W = 24;
-	const BLACK_H = 70;
+	const START_OCTAVE = 2;
+	const END_OCTAVE = 6;
 
-	let currentOctave = $state(4);
+	const WHITE_W = 50;
+	const WHITE_H = 220;
+	const BLACK_W = 30;
+	const BLACK_H = 130;
 
-	const BLACK_KEYS = [
-		{ name: 'C#', whiteIndex: 0 },
-		{ name: 'D#', whiteIndex: 1 },
-		{ name: 'F#', whiteIndex: 3 },
-		{ name: 'G#', whiteIndex: 4 },
-		{ name: 'A#', whiteIndex: 5 }
-	];
+	const whiteKeys: any[] = [];
+	const blackKeys: any[] = [];
 
-	const VIEW_WIDTH = 7 * WHITE_W;
+	let whiteKeyCount = 0;
+
+	for (let oct = START_OCTAVE; oct <= END_OCTAVE; oct++) {
+		NATURAL_NOTE_NAMES.forEach((note) => {
+			whiteKeys.push({
+				note,
+				octave: oct,
+				x: whiteKeyCount * WHITE_W
+			});
+
+			if (['C', 'D', 'F', 'G', 'A'].includes(note)) {
+				blackKeys.push({
+					note: note,
+					accidental: '#',
+					octave: oct,
+					x: (whiteKeyCount + 1) * WHITE_W - BLACK_W / 2
+				});
+			}
+
+			whiteKeyCount++;
+		});
+	}
+
+	const VIEW_WIDTH = whiteKeyCount * WHITE_W;
+	const VIEW_HEIGHT = WHITE_H + 2;
+
+	onMount(() => {
+		const c4Key = whiteKeys.find((k) => k.note === 'C' && k.octave === 4);
+
+		if (c4Key && topScrollRef && pianoScrollRef) {
+			const centerPos = c4Key.x;
+
+			// 3. Apply scroll immediately
+			topScrollRef.scrollLeft = centerPos;
+			pianoScrollRef.scrollLeft = centerPos;
+		}
+	});
 
 	function handlePianoClick(e: PointerEvent) {
 		const target = e.target as SVGElement;
+
 		const note = target.dataset.note;
+		const octave = target.dataset.octave;
 		const accidental = target.dataset.accidental || null;
 
-		if (!note) return;
+		if (!note || !octave) return;
 
 		pianoAudioService.playNote({
 			name: note,
-			octave: currentOctave,
+			octave: parseInt(octave),
 			accidental: accidental
 		});
 	}
 
-	function changeOctave(delta: number) {
-		const newOctave = currentOctave + delta;
-		if (newOctave >= MIN_OCTAVE && newOctave <= MAX_OCTAVE) {
-			currentOctave = newOctave;
+	// --- SCROLL SYNC LOGIC ---
+	let topScrollRef: HTMLDivElement | undefined = $state();
+	let pianoScrollRef: HTMLDivElement | undefined = $state();
+
+	function handleTopScroll() {
+		if (topScrollRef && pianoScrollRef) {
+			pianoScrollRef.scrollLeft = topScrollRef.scrollLeft;
 		}
 	}
 </script>
 
 <div class="piano-wrapper">
-	<div class="controls">
-		<button
-			class="secondary"
-			disabled={currentOctave <= MIN_OCTAVE}
-			onclick={() => changeOctave(-1)}>-</button
-		>
-		<p class="label">Octave {currentOctave}</p>
-		<button class="secondary" disabled={currentOctave >= MAX_OCTAVE} onclick={() => changeOctave(1)}
-			>+</button
-		>
+	<div class="scrollbar-octaves">
+		<p class="body-regular">C{START_OCTAVE}</p>
+		<p class="body-regular">C4</p>
+		<p class="body-regular">C{END_OCTAVE}</p>
 	</div>
-
-	<div class="svg-container">
+	<div class="top-scrollbar" bind:this={topScrollRef} onscroll={() => handleTopScroll()}>
+		<div style="width: {VIEW_WIDTH}px; height: 1px;"></div>
+	</div>
+	<div class="scroll-container" bind:this={pianoScrollRef}>
 		<svg
-			viewBox="0 0 {VIEW_WIDTH} {WHITE_H + 2}"
+			viewBox="0 0 {VIEW_WIDTH} {VIEW_HEIGHT}"
 			class="piano-svg"
+			style="width: {VIEW_WIDTH}px;"
 			onpointerdown={handlePianoClick}
 			role="none"
 		>
 			<defs>
-				<linearGradient id="white-grad" x1="0" x2="0" y1="0" y2="1">
-					<stop offset="0%" stop-color="#fff" />
-					<stop offset="100%" stop-color="#eee" />
-				</linearGradient>
 				<linearGradient id="black-grad" x1="0" x2="1" y1="0" y2="1">
 					<stop offset="0%" stop-color="#444" />
 					<stop offset="100%" stop-color="#111" />
 				</linearGradient>
 			</defs>
 
-			{#each NATURAL_NOTE_NAMES as note, i}
+			{#each whiteKeys as k}
 				<rect
-					data-note={note}
-					x={i * WHITE_W}
+					data-note={k.note}
+					data-octave={k.octave}
+					x={k.x}
 					y="0"
 					width={WHITE_W}
 					height={WHITE_H}
@@ -83,14 +115,17 @@
 					ry="4"
 					class="key white"
 				/>
+				{#if k.note === 'C'}
+					<text x={k.x + WHITE_W / 2} y={WHITE_H - 10} class="key-label">C{k.octave}</text>
+				{/if}
 			{/each}
 
-			{#each BLACK_KEYS as k}
-				{@const x = (k.whiteIndex + 1) * WHITE_W - BLACK_W / 2}
+			{#each blackKeys as k}
 				<rect
-					data-note={k.name.charAt(0)}
-					data-accidental="#"
-					{x}
+					data-note={k.note}
+					data-accidental={k.accidental}
+					data-octave={k.octave}
+					x={k.x}
 					y="0"
 					width={BLACK_W}
 					height={BLACK_H}
@@ -106,35 +141,53 @@
 <style>
 	.piano-wrapper {
 		width: 100%;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: var(--space-4);
 		-webkit-tap-highlight-color: transparent;
-		padding: var(--space-1);
 	}
 
-	.controls {
+	.scrollbar-octaves {
 		display: flex;
-		align-items: center;
-		gap: var(--space-4);
+		justify-content: space-between;
+		padding-inline: var(--space-4);
 	}
 
-	.label {
-		font-variant-numeric: tabular-nums;
-		min-width: 5rem;
-		text-align: center;
-	}
-
-	.svg-container {
+	.top-scrollbar {
 		width: 100%;
-		max-width: 400px;
+		overflow-x: auto;
+		overflow-y: hidden;
+		padding-block: var(--space-1);
+		margin-bottom: var(--space-6);
+		cursor: grab;
+	}
+	.top-scrollbar::-webkit-scrollbar {
+		height: 2rem;
+	}
+	.top-scrollbar::-webkit-scrollbar-track {
+		background: var(--color-surface-dark);
+		height: 2rem;
+	}
+	.top-scrollbar::-webkit-scrollbar-thumb {
+		background-color: var(--color-surface-xdark);
+		border-radius: var(--radius-full);
+		height: 2rem;
+	}
+
+	.scroll-container {
+		width: 100%;
+		overflow-x: hidden;
+		-webkit-overflow-scrolling: touch;
+		scrollbar-width: none;
+		user-select: none;
+		-ms-overflow-style: none;
 	}
 
 	.piano-svg {
-		width: 100%;
 		height: auto;
+		display: block;
+		margin: 0 auto;
 		cursor: pointer;
+		max-width: unset;
+		padding-inline: var(--space-4);
+		background-color: var(--color-surface-dark);
 	}
 
 	.key {
@@ -143,15 +196,17 @@
 			fill 0.05s;
 		pointer-events: all;
 	}
+
 	.key.white {
-		fill: url(#white-grad);
-		stroke: #ccc;
+		fill: white;
+		stroke: #d5d7dd;
 		stroke-width: 1px;
 	}
 	.key.white:active {
-		fill: #ddd;
-		transform: translateY(1px);
+		fill: #f3f3f5;
+		transform: translateY(2px);
 	}
+
 	.key.black {
 		fill: url(#black-grad);
 		stroke: #000;
@@ -159,6 +214,14 @@
 	}
 	.key.black:active {
 		fill: #222;
-		transform: translateY(1px);
+		transform: translateY(2px);
+	}
+
+	.key-label {
+		font-size: var(--font-size-16);
+		fill: #6f727a;
+		text-anchor: middle;
+		pointer-events: none;
+		user-select: none;
 	}
 </style>
