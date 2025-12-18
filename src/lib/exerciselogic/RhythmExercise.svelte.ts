@@ -11,22 +11,19 @@ export type ExerciseParams = {
 };
 
 export type ExercisePresetConfig = {
-  allowedNoteDurations: string[];
-  allowedRests: string[];
+  durationBarPatterns: string[][];
 }
 
 export const exercisePresetParams: Record<difficulty, ExercisePresetConfig> = {
   easy: {
-    allowedNoteDurations: ["w", "h", "q"],
-    allowedRests: ["q"]
+    // durationBarPatterns: [['q', 'q', 'q', 'q'], ['q', 'h', 'q'], ['h', 'q', 'q'], ['w'], ['q', 'q', 'h'], ['h', 'h'], ['q', 'rq', 'q', 'rq']],
+    durationBarPatterns: [['q', 'q', 'q', 'q'], ['h', 'h'], ['q', 'rq', 'q', 'rq']],
   },
   medium: {
-    allowedNoteDurations: ["h", "q", "e"],
-    allowedRests: ["q, e"]
+    durationBarPatterns: [['e', 'e', 'q', 'h'], ['h', 'e', 'e', 'e', 'e'], ['q', 'h', 'e', 'e'], ['q', 'q', 'q', 'q'], ['e', 'e', 'e', 'e', 'h'], ['q', 'e', 'e', 'q', 'q']],
   },
   hard: {
-    allowedNoteDurations: ["h", "q", "e"],
-    allowedRests: ["h, q, e"]
+    durationBarPatterns: [['q', 'q', 'q', 'q']],
   },
 }
 
@@ -34,7 +31,12 @@ const noteValuesMap: Record<string, number> = {
   "w": 4,
   "h": 2,
   "q": 1,
-  "e": 0.5
+  "e": 0.5,
+  "s": 0.25,
+  "rw": 4,
+  "rh": 2,
+  "rq": 1,
+  "re": 0.5
 };
 
 const BPM_MS = 750;
@@ -93,31 +95,20 @@ export class RhythmExercise {
   private generateTimeStamps() {
     let generatedNoteStrings: string[] = [];
     this.timeStampEntries = [];
-    let currentAccumulatedBeats = 0;
+
+    let currentAccumulatedTime = 0;
+    const possiblePatterns = this.currentExerciseParam.durationBarPatterns;
 
     for (let b = 0; b < BARS_COUNT; b++) {
-      let beatsInCurrentBar = 0;
+      const randomIndex = Math.floor(Math.random() * possiblePatterns.length);
+      const selectedPattern = possiblePatterns[randomIndex];
 
-      while (beatsInCurrentBar < BEATS_PER_BAR) {
+      for (const noteKey of selectedPattern) {
+        this.timeStampEntries.push(currentAccumulatedTime);
+        generatedNoteStrings.push(noteKey);
 
-        const remainingSpace = BEATS_PER_BAR - beatsInCurrentBar;
-
-        const validNotes = this.currentExerciseParam.allowedNoteDurations.filter(noteKey => {
-          const beatValue = noteValuesMap[noteKey];
-          return beatValue <= remainingSpace;
-        });
-
-        if (validNotes.length === 0) break;
-
-        const randomNoteKey = validNotes[Math.floor(Math.random() * validNotes.length)];
-        const noteBeatValue = noteValuesMap[randomNoteKey];
-
-        this.timeStampEntries.push(currentAccumulatedBeats);
-        generatedNoteStrings.push(randomNoteKey);
-
-        currentAccumulatedBeats += noteBeatValue * BPM_MS;
-
-        beatsInCurrentBar += noteBeatValue;
+        const beatValue = noteValuesMap[noteKey];
+        currentAccumulatedTime += beatValue * BPM_MS;
       }
     }
 
@@ -174,9 +165,9 @@ export class RhythmExercise {
     if (this._isGameOver || !this.timedFunctionComponentInstance || !this.triesComponentInstance) return;
 
     this.generateTimeStamps();
+    this.staffRendererInstance!.clearAllNotes();
     const staffData = rhythmStringToVectorScoreData(this._currentNoteStrings);
 
-    this.staffRendererInstance!.clearAllNotes();
     staffData.forEach(noteGroup => {
       // If sub arr is all 'e' notes, draw a beamed note
       if (noteGroup.length > 1 && noteGroup.every(note => note === "e")) {
