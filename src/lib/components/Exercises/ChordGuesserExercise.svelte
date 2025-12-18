@@ -43,7 +43,7 @@
 	function setupStaff(node: HTMLElement) {
 		const newStaff = new MusicStaff(node, {
 			staffType: 'treble',
-			width: 200,
+			width: 150,
 			scale: 1.4,
 			spaceAbove: 3,
 			spaceBelow: 4,

@@ -131,7 +131,6 @@ export class SightreadingExercise {
     if (!this.staffRendererInstance) return;
 
     this.staffRendererInstance.changeNoteByIndex(noteToVectorScoreString(note), 0);
-    this.staffRendererInstance.justifyNotes();
   }
 
   private handleTimeout = () => {
@@ -169,6 +168,8 @@ export class SightreadingExercise {
     if (this.staffRendererInstance) return;
     this.staffRendererInstance = renderer;
     const vsNoteStr = noteToVectorScoreString(this.currentNote);
+
+    // Justifies note once, as the changeNoteByIndex does not affect the X pos
     this.staffRendererInstance.drawNote(vsNoteStr);
     this.staffRendererInstance.justifyNotes();
   }

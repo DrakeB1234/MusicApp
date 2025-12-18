@@ -147,6 +147,10 @@ export class ChordGuesserExercise {
   setRenderer = (renderer: MusicStaff) => {
     if (this.staffRendererInstance) return;
     this.staffRendererInstance = renderer;
+
+    const vectorScoreNoteStrings = this.currentChord.notes.map(e => noteToVectorScoreString(e));
+    this.staffRendererInstance.drawChord(vectorScoreNoteStrings);
+    this.staffRendererInstance.justifyNotes();
   }
 
   handleMidiInput = (message: MidiMessage) => {
@@ -178,9 +182,8 @@ export class ChordGuesserExercise {
 
     this.addChordStringsToButtonInput();
 
-    this.staffRendererInstance!.clearAllNotes();
-    this.staffRendererInstance!.drawChord(this.currentChord.notes.map(e => noteToVectorScoreString(e)));
-    this.staffRendererInstance!.justifyNotes();
+    const vectorScoreNoteStrings = this.currentChord.notes.map(e => noteToVectorScoreString(e));
+    this.staffRendererInstance!.changeChordByIndex(vectorScoreNoteStrings, 0);
 
     this._isListeningInput = true;
     this._timeLeft = this.currentExerciseParam.timeToGuess;
