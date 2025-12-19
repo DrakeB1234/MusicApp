@@ -50,20 +50,21 @@
 
 	function handleStart() {
 		isStart = true;
-		game.start();
+		game.startGameLoop();
 	}
 </script>
 
 <ExerciseShell
-	showMidiDevice
-	onExit={handleExitPressed}
+	{handleStart}
+	handleExit={handleExitPressed}
 	stats={[
 		{ value: game.score, label: 'Score' },
 		{ value: game.correctAndTotalNotes, label: 'Correct' },
 		{ value: game.timeLeft, label: 'Time Left' }
 	]}
-	{isStart}
-	{handleStart}
+	isGameOver={game.isGameOver}
+	isStarted={isStart}
+	showMidiDevice
 >
 	{#snippet viewport()}
 		{#if !game.isGameOver}

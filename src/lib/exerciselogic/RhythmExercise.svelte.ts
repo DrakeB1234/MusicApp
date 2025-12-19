@@ -67,6 +67,7 @@ export class RhythmExercise {
   get triesLeft(): number { return this.triesComponentInstance!.triesLeftCount };
   get score(): number { return this._score };
   get correct(): number { return this._correct };
+  get isGameOver(): boolean { return this._isGameOver };
   get currentNoteStrings(): string[] { return this._currentNoteStrings };
   get isListeningInput(): boolean { return this._isListeningInput };
   get currentStartTime(): string {
@@ -138,7 +139,7 @@ export class RhythmExercise {
     this._correct++;
 
     setTimeout(() => {
-      this.start();
+      this.newQuestion();
     }, WAIT_TIME_AFTER_TRY_MS);
   }
 
@@ -147,7 +148,7 @@ export class RhythmExercise {
     this.triesComponentInstance?.decrementTries();
 
     setTimeout(() => {
-      this.start();
+      this.newQuestion();
     }, WAIT_TIME_AFTER_TRY_MS);
   }
 
@@ -155,12 +156,7 @@ export class RhythmExercise {
     this.inputData = [];
   }
 
-  setRenderer = (renderer: RhythmStaff) => {
-    if (this.staffRendererInstance) return;
-    this.staffRendererInstance = renderer;
-  }
-
-  async start() {
+  private async newQuestion() {
     if (this._isGameOver || !this.timedFunctionComponentInstance || !this.triesComponentInstance) return;
 
     this.generateTimeStamps();
@@ -213,6 +209,15 @@ export class RhythmExercise {
     this.validateInput(listeningStartTime);
   }
 
+  setRenderer = (renderer: RhythmStaff) => {
+    if (this.staffRendererInstance) return;
+    this.staffRendererInstance = renderer;
+  }
+
+  startGameLoop() {
+    this.newQuestion();
+  }
+
   handleInput = () => {
     if (this._isGameOver || !this._isListeningInput) return;
     const timestamp = Date.now();
@@ -228,7 +233,7 @@ export class RhythmExercise {
     this._currentStartTime = 0;
     this._isGameOver = false;
 
-    this.start();
+    this.newQuestion();
 
     return;
   }

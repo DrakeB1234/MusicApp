@@ -75,6 +75,7 @@ export class ChordGuesserExercise {
   get timeLeft(): number { return this._timeLeft };
   get score(): number { return this._score };
   get correct(): number { return this._correct };
+  get isGameOver(): boolean { return this._isGameOver };
   get isListeningInput(): boolean { return this._isListeningInput };
   get buttonChordStrings(): string[] { return this._buttonChordStrings };
 
@@ -118,7 +119,7 @@ export class ChordGuesserExercise {
     this.timedFunctionComponentInstance!.stop();
 
     setTimeout(() => {
-      this.start();
+      this.newQuestion();
     }, WAIT_TIME_AFTER_TRY_MS);
   }
 
@@ -128,7 +129,7 @@ export class ChordGuesserExercise {
     this.timedFunctionComponentInstance!.stop();
 
     setTimeout(() => {
-      this.start();
+      this.newQuestion();
     }, WAIT_TIME_AFTER_TRY_MS);
   }
 
@@ -144,38 +145,7 @@ export class ChordGuesserExercise {
     this._buttonChordStrings = shuffleArray(Array.from(options));
   }
 
-  setRenderer = (renderer: MusicStaff) => {
-    if (this.staffRendererInstance) return;
-    this.staffRendererInstance = renderer;
-
-    const vectorScoreNoteStrings = this.currentChord.notes.map(e => noteToVectorScoreString(e));
-    this.staffRendererInstance.drawChord(vectorScoreNoteStrings);
-    this.staffRendererInstance.justifyNotes();
-  }
-
-  handleMidiInput = (message: MidiMessage) => {
-    if (this._isGameOver || !this._isListeningInput) return;
-    if (message.type === "noteOn" && message.attackType === "chord") {
-      this.handleInput(message.notes);
-    }
-  }
-
-  handleInput = (chord: string | Note[]) => {
-    if (this._isGameOver || !this._isListeningInput) return;
-
-    this.attemptedInput = true;
-    if (typeof chord === "string") {
-      if (chord === this.currentChord.string) this.handleCorrect();
-      else this.handleIncorrect();
-    }
-    else {
-      const chordString = notesToChordString(chord);
-      if (chordString === this.currentChord.string) this.handleCorrect();
-      else this.handleIncorrect();
-    }
-  }
-
-  async start() {
+  private async newQuestion() {
     if (this._isGameOver || !this.triesComponentInstance || !this.timedFunctionComponentInstance) return;
     this.attemptedInput = false;
     this.currentChord = this.generateNewChord();
@@ -197,6 +167,41 @@ export class ChordGuesserExercise {
     // and the user never inputted anything, then the answer is incorrect.
     if (!this.attemptedInput) {
       this.handleIncorrect();
+    }
+  }
+
+  setRenderer = (renderer: MusicStaff) => {
+    if (this.staffRendererInstance) return;
+    this.staffRendererInstance = renderer;
+
+    const vectorScoreNoteStrings = this.currentChord.notes.map(e => noteToVectorScoreString(e));
+    this.staffRendererInstance.drawChord(vectorScoreNoteStrings);
+    this.staffRendererInstance.justifyNotes();
+  }
+
+  startGameLoop() {
+    this.newQuestion();
+  }
+
+  handleMidiInput = (message: MidiMessage) => {
+    if (this._isGameOver || !this._isListeningInput) return;
+    if (message.type === "noteOn" && message.attackType === "chord") {
+      this.handleInput(message.notes);
+    }
+  }
+
+  handleInput = (chord: string | Note[]) => {
+    if (this._isGameOver || !this._isListeningInput) return;
+
+    this.attemptedInput = true;
+    if (typeof chord === "string") {
+      if (chord === this.currentChord.string) this.handleCorrect();
+      else this.handleIncorrect();
+    }
+    else {
+      const chordString = notesToChordString(chord);
+      if (chordString === this.currentChord.string) this.handleCorrect();
+      else this.handleIncorrect();
     }
   }
 

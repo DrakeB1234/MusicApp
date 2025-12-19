@@ -37,14 +37,15 @@
 </script>
 
 <ExerciseShell
-	onExit={handleExitPressed}
+	{handleStart}
+	handleExit={handleExitPressed}
 	stats={[
 		{ value: game.score, label: 'Score' },
 		{ value: game.correct, label: 'Correct' },
 		{ value: game.triesLeft, label: 'Tries Left' }
 	]}
-	{isStart}
-	{handleStart}
+	isStarted={isStart}
+	isGameOver={game.isGameOver}
 >
 	{#snippet viewport()}
 		<div use:setupStaff class="staff-container"></div>

@@ -32,12 +32,6 @@
 		};
 	});
 
-	// Toggles internal state, which renders staff container, on mount its calls setupStaff due to the staff container div
-	// use:setupStaff
-	function handleStart() {
-		isStart = true;
-	}
-
 	function setupStaff(node: HTMLElement) {
 		const newStaff = new MusicStaff(node, {
 			staffType: 'treble',
@@ -50,20 +44,25 @@
 		});
 
 		game.setRenderer(newStaff);
-		game.start();
+	}
+
+	function handleStart() {
+		isStart = true;
+		game.startGameLoop();
 	}
 </script>
 
 <ExerciseShell
-	showMidiDevice
-	onExit={handleExitPressed}
+	{handleStart}
+	handleExit={handleExitPressed}
 	stats={[
 		{ value: game.score, label: 'Score' },
 		{ value: game.correct, label: 'Correct' },
 		{ value: game.triesLeft, label: 'Tries' }
 	]}
-	{isStart}
-	{handleStart}
+	isStarted={isStart}
+	isGameOver={game.isGameOver}
+	showMidiDevice
 >
 	{#snippet viewport()}
 		<div class="game-container">

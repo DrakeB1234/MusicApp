@@ -10,26 +10,28 @@
 	};
 
 	let {
-		onExit,
 		stats,
 		viewport,
 		controls,
-		isStart: isStarted,
+		handleExit,
 		handleStart,
+		isStarted,
+		isGameOver,
 		showMidiDevice = false
 	}: {
-		onExit: () => void;
 		stats: Stat[];
 		viewport: Snippet;
 		controls: Snippet;
+		handleExit: () => void;
 		handleStart: () => void;
-		isStart: boolean;
+		isStarted: boolean;
+		isGameOver: boolean;
 		showMidiDevice?: boolean;
 	} = $props();
 </script>
 
 <main class="game">
-	<button class="text on-background icon-container" onclick={onExit}>
+	<button class="text on-background icon-container" onclick={handleExit}>
 		<ExitIcon />
 		Exit
 	</button>
@@ -44,7 +46,8 @@
 		</div>
 
 		<div class="game-viewport">
-			<div class="viewport-wrapper" class:hidden={!isStarted}>
+			<!-- RENDER VIEWPORT, HIDE WITH CSS -->
+			<div class="viewport-wrapper" class:hidden={!isStarted || isGameOver}>
 				{@render viewport()}
 			</div>
 			{#if !isStarted}
@@ -54,6 +57,12 @@
 						<StartStopIcon color="var(--color-on-primary)" />
 						Start
 					</button>
+				</div>
+			{/if}
+			{#if isGameOver && isStarted}
+				<div class="gameover-container">
+					<p class="body-large">Game Over!</p>
+					<button class="primary large icon-container" onclick={handleExit}>Continue</button>
 				</div>
 			{/if}
 		</div>
@@ -93,6 +102,13 @@
 		padding: var(--space-4) var(--space-2);
 		background-color: var(--color-background);
 		border-bottom: 1px solid var(--color-border);
+	}
+	.gameover-container {
+		text-align: center;
+	}
+	.gameover-container > button {
+		margin-top: var(--space-4);
+		margin-inline: auto;
 	}
 	.device-connect {
 		padding: var(--space-2);

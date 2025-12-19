@@ -3,7 +3,6 @@
 	import { sfxAudioService } from '$lib/audio/sfxAudioService.svelte';
 	import ExerciseShell from './ExerciseShell.svelte';
 	import { RhythmExercise } from '$lib/exerciselogic/RhythmExercise.svelte';
-	import StartStopIcon from '../Icons/StartStopIcon.svelte';
 	import { RhythmStaff } from 'vector-score';
 
 	const { handleExitPressed, params }: { handleExitPressed: () => void; params: string } = $props();
@@ -20,10 +19,9 @@
 		game.destroy();
 	});
 
-	// Toggles internal state, which renders staff container, on mount its calls setupStaff due to the staff container div
-	// use:setupStaff
 	function handleStart() {
 		isStart = true;
+		game.startGameLoop();
 	}
 
 	function setupStaff(node: HTMLElement) {
@@ -39,19 +37,19 @@
 		});
 
 		game.setRenderer(newStaff);
-		game.start();
 	}
 </script>
 
 <ExerciseShell
-	onExit={handleExitPressed}
+	{handleStart}
+	handleExit={handleExitPressed}
 	stats={[
 		{ value: game.score, label: 'Score' },
 		{ value: game.correct, label: 'Correct' },
 		{ value: game.triesLeft, label: 'Tries' }
 	]}
-	{isStart}
-	{handleStart}
+	isGameOver={game.isGameOver}
+	isStarted={isStart}
 >
 	{#snippet viewport()}
 		<div class="countdown-container">
