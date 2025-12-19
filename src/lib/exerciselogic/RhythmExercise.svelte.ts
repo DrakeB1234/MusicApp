@@ -16,7 +16,7 @@ export type ExercisePresetConfig = {
 
 export const exercisePresetParams: Record<difficulty, ExercisePresetConfig> = {
   easy: {
-    durationBarPatterns: [['q', 'q', 'q', 'q'], ['q', 'h', 'q'], ['h', 'q', 'q'], ['w'], ['q', 'q', 'h'], ['h', 'h'], ['q', 'rq', 'q', 'rq'], ['h', 'rq', 'rq', 'q'], ['q', 'rq', 'h'], ['rq', 'rq', 'q', 'q']],
+    durationBarPatterns: [['q', 'q', 'q', 'q'], ['q', 'h', 'q'], ['h', 'q', 'q'], ['w'], ['q', 'q', 'h'], ['h', 'h'], ['q', 'rq', 'q', 'rq'], ['h', 'rq', 'rq'], ['q', 'rq', 'h'], ['rq', 'rq', 'q', 'q']],
   },
   medium: {
     durationBarPatterns: [['e', 'e', 'q', 'h'], ['h', 'e', 'e', 'e', 'e'], ['q', 'h', 'e', 'e'], ['q', 'q', 'q', 'q'], ['e', 'e', 'e', 'e', 'h'], ['q', 'e', 'e', 'q', 'q'], ['e', 'e', 'rq', 'q', 'q'], ['rh', 'e', 'e', 'e', 'e'], ['h', 'q', 'rq'], ['h', 'rh']],
