@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { pianoAudioService } from '$lib/audio/pianoAudioService.svelte';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { sfxAudioService } from '$lib/audio/sfxAudioService.svelte';
 	import ExerciseShell from './ExerciseShell.svelte';
 	import { MusicStaff } from 'vector-score';
 	import { IntervalsDrillExercise } from '$lib/exerciselogic/IntervalsDrillExercise.svelte';
+	import ExerciseGeneralInput from '../Inputs/ExerciseGeneralInput.svelte';
 
 	const { handleExitPressed }: { handleExitPressed: () => void } = $props();
 
@@ -14,6 +15,11 @@
 	onMount(() => {
 		pianoAudioService.init();
 		sfxAudioService.init();
+	});
+
+	onDestroy(() => {
+		Howler.stop();
+		game.destroy();
 	});
 
 	function setupStaff(node: HTMLElement) {
@@ -52,7 +58,13 @@
 	{/snippet}
 
 	{#snippet controls()}
-		<div class="inputs"></div>
+		<div class="inputs">
+			<ExerciseGeneralInput
+				disableInputs={!game.isListeningInput}
+				handleButtonPressed={game.handleInput}
+				buttonValues={game.buttonValues}
+			/>
+		</div>
 	{/snippet}
 </ExerciseShell>
 
@@ -62,7 +74,6 @@
 		margin-inline: auto;
 	}
 	.inputs {
-		padding: var(--space-2);
-		padding-bottom: var(--space-5);
+		padding: var(--space-4) var(--space-2);
 	}
 </style>

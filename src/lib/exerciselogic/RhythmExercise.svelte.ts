@@ -87,6 +87,7 @@ export class RhythmExercise {
   private handleTriesOut = () => {
     this._isGameOver = true;
     this.timedFunctionComponentInstance?.stop();
+    this._isListeningInput = false;
   }
 
   private generateTimeStamps() {

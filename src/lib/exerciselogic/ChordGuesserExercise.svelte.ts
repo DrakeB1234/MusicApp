@@ -93,6 +93,7 @@ export class ChordGuesserExercise {
   private handleTriesOut = () => {
     this._isGameOver = true;
     this._timeLeft = 0;
+    this._isListeningInput = false;
   }
 
   private generateRandomChordString(): string {
