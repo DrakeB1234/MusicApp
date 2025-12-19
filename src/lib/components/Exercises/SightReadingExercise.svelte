@@ -16,6 +16,7 @@
 		$props();
 
 	const game = new SightreadingExercise(params.difficulty, params.clef);
+	let isStart: boolean = $state(false);
 
 	onMount(() => {
 		pianoAudioService.init();
@@ -46,6 +47,11 @@
 
 		game.setRenderer(newStaff);
 	}
+
+	function handleStart() {
+		isStart = true;
+		game.start();
+	}
 </script>
 
 <ExerciseShell
@@ -56,6 +62,8 @@
 		{ value: game.correctAndTotalNotes, label: 'Correct' },
 		{ value: game.timeLeft, label: 'Time Left' }
 	]}
+	{isStart}
+	{handleStart}
 >
 	{#snippet viewport()}
 		{#if !game.isGameOver}
@@ -64,9 +72,10 @@
 			<ExerciseGameOver message="Times Up!" continuePressed={handleExitPressed} />
 		{/if}
 	{/snippet}
+
 	{#snippet controls()}
 		<div class="inputs">
-			<NoteInputButtons handleNotePressed={game.handleNoteInput} />
+			<NoteInputButtons handleNotePressed={game.handleNoteInput} disabled={!isStart} />
 		</div>
 	{/snippet}
 </ExerciseShell>

@@ -50,51 +50,29 @@
 		{ value: game.correct, label: 'Correct' },
 		{ value: game.triesLeft, label: 'Tries' }
 	]}
+	{isStart}
+	{handleStart}
 >
 	{#snippet viewport()}
-		{#if !isStart}
-			<div class="start-container">
-				<p class="body-large">When ready, press start!</p>
-				<button class="primary icon-container start" onclick={handleStart}>
-					<StartStopIcon color="var(--color-on-primary)" />
-					Start
-				</button>
-			</div>
-		{:else}
-			<div class="game-container">
-				<div class="countdown-container">
-					<p class="ui-large bold">{game.currentStartTime}</p>
-				</div>
-				<div use:setupStaff class="staff-container"></div>
-			</div>
-		{/if}
+		<div class="countdown-container">
+			<p class="ui-large bold">{game.currentStartTime}</p>
+		</div>
+		<div use:setupStaff class="staff-container"></div>
 	{/snippet}
 	{#snippet controls()}
 		<div class="input">
-			<button class="secondary tap" disabled={!game.isListeningInput} onclick={game.handleInput}
-				>TAP</button
+			<button
+				class="secondary large tap"
+				disabled={!game.isListeningInput}
+				onclick={game.handleInput}>TAP</button
 			>
 		</div>
 	{/snippet}
 </ExerciseShell>
 
 <style>
-	.start-container {
-		display: grid;
-		place-items: center;
-		gap: var(--space-4);
-		padding: var(--space-4);
-	}
-	button.start {
-		padding: var(--space-4) var(--space-5);
-		font-size: var(--font-size-20);
-	}
 	button.tap {
-		width: 100%;
-		max-width: 120px;
-		padding: var(--space-4) var(--space-5);
 		transition: none;
-		font-size: var(--font-size-20);
 	}
 	button.tap:active {
 		background-color: var(--color-primary);
@@ -105,9 +83,6 @@
 		align-items: center;
 		gap: var(--space-4);
 		padding: var(--space-4);
-	}
-	.game-container {
-		display: block;
 	}
 	.staff-container {
 		margin-inline: auto;

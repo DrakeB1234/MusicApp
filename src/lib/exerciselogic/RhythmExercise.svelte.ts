@@ -47,9 +47,6 @@ const BEATS_PER_BAR = 4;
 
 const WAIT_TIME_AFTER_TRY_MS = 1000;
 
-// const testTapTimestamps = [0, 750, 1500, 2250];
-const testTapTimestamps = [0, 325, 750, 1075, 1500, 1825, 2250, 2575];
-
 export class RhythmExercise {
   private staffRendererInstance: RhythmStaff | null = null;
   private triesComponentInstance: TriesComponent | null;

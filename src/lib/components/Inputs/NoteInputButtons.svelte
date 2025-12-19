@@ -1,7 +1,10 @@
 <script lang="ts">
 	import { NATURAL_NOTE_NAMES, type Note } from '$lib/helpers/notehelpers';
 
-	let { handleNotePressed }: { handleNotePressed: (note: Note) => void } = $props();
+	let {
+		handleNotePressed,
+		disabled
+	}: { handleNotePressed: (note: Note) => void; disabled: boolean } = $props();
 
 	const ActiveAccidental = Object.freeze({
 		SHARP: '#',
@@ -30,17 +33,21 @@
 		<button
 			class="secondary"
 			class:active={activeAccidental === ActiveAccidental.SHARP}
-			onclick={() => handleActiveAccidentalPressed(ActiveAccidental.SHARP)}>#</button
+			onclick={() => handleActiveAccidentalPressed(ActiveAccidental.SHARP)}
+			{disabled}>#</button
 		>
 		<button
 			class="secondary"
 			class:active={activeAccidental === ActiveAccidental.FLAT}
-			onclick={() => handleActiveAccidentalPressed(ActiveAccidental.FLAT)}>b</button
+			onclick={() => handleActiveAccidentalPressed(ActiveAccidental.FLAT)}
+			{disabled}>b</button
 		>
 	</div>
 	<div class="note-buttons">
 		{#each NATURAL_NOTE_NAMES as name}
-			<button class="secondary" onclick={() => handleNoteNamePressed(name)}>{name}</button>
+			<button class="secondary" onclick={() => handleNoteNamePressed(name)} {disabled}
+				>{name}</button
+			>
 		{/each}
 	</div>
 </div>

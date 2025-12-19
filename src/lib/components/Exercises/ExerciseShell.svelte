@@ -2,6 +2,7 @@
 	import ExitIcon from '$lib/components/Icons/ExitIcon.svelte';
 	import type { Snippet } from 'svelte';
 	import MidiDeviceConnect from '../MidiDeviceConnect.svelte';
+	import StartStopIcon from '../Icons/StartStopIcon.svelte';
 
 	type Stat = {
 		label: string;
@@ -13,12 +14,16 @@
 		stats,
 		viewport,
 		controls,
+		isStart: isStarted,
+		handleStart,
 		showMidiDevice = false
 	}: {
 		onExit: () => void;
 		stats: Stat[];
 		viewport: Snippet;
-		controls?: Snippet;
+		controls: Snippet;
+		handleStart: () => void;
+		isStart: boolean;
 		showMidiDevice?: boolean;
 	} = $props();
 </script>
@@ -39,17 +44,26 @@
 		</div>
 
 		<div class="game-viewport">
-			{@render viewport()}
-		</div>
-
-		{#if controls}
-			{#if showMidiDevice}
-				<div class="device-connect">
-					<MidiDeviceConnect />
+			<div class="viewport-wrapper" class:hidden={!isStarted}>
+				{@render viewport()}
+			</div>
+			{#if !isStarted}
+				<div class="start-container">
+					<p class="body-large">When Ready, press Start!</p>
+					<button class="primary large icon-container" onclick={handleStart}>
+						<StartStopIcon color="var(--color-on-primary)" />
+						Start
+					</button>
 				</div>
 			{/if}
-			{@render controls()}
+		</div>
+
+		{#if showMidiDevice}
+			<div class="device-connect">
+				<MidiDeviceConnect />
+			</div>
 		{/if}
+		{@render controls()}
 	</div>
 </main>
 
@@ -67,14 +81,23 @@
 	.information-entry:last-child {
 		text-align: end;
 	}
+	.start-container > button {
+		margin-top: var(--space-4);
+		margin-inline: auto;
+	}
 	.game-viewport {
-		padding-block: var(--space-4);
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+
+		padding: var(--space-4) var(--space-2);
 		background-color: var(--color-background);
 		border-bottom: 1px solid var(--color-border);
-		display: flex;
-		justify-content: center;
 	}
 	.device-connect {
 		padding: var(--space-2);
+	}
+	.hidden {
+		display: none;
 	}
 </style>

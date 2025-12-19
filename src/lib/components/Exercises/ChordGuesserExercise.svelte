@@ -2,13 +2,11 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { sfxAudioService } from '$lib/audio/sfxAudioService.svelte';
 	import ExerciseShell from './ExerciseShell.svelte';
-	import StartStopIcon from '../Icons/StartStopIcon.svelte';
 	import { MusicStaff } from 'vector-score';
 	import { ChordGuesserExercise } from '$lib/exerciselogic/ChordGuesserExercise.svelte';
 	import { midiService } from '$lib/midiservice/midiService.svelte';
 	import ExerciseGeneralInput from '../Inputs/ExerciseGeneralInput.svelte';
 	import { pianoAudioService } from '$lib/audio/pianoAudioService.svelte';
-	import MidiDeviceConnect from '../MidiDeviceConnect.svelte';
 
 	const { handleExitPressed, params }: { handleExitPressed: () => void; params: string } = $props();
 
@@ -64,24 +62,16 @@
 		{ value: game.correct, label: 'Correct' },
 		{ value: game.triesLeft, label: 'Tries' }
 	]}
+	{isStart}
+	{handleStart}
 >
 	{#snippet viewport()}
-		{#if !isStart}
-			<div class="start-container">
-				<p class="body-large">When ready, press start!</p>
-				<button class="primary icon-container custom" onclick={handleStart}>
-					<StartStopIcon color="var(--color-on-primary)" />
-					Start
-				</button>
+		<div class="game-container">
+			<div class="countdown-container">
+				<p class="ui-large bold">{game.timeLeft}</p>
 			</div>
-		{:else}
-			<div class="game-container">
-				<div class="countdown-container">
-					<p class="ui-large bold">{game.timeLeft}</p>
-				</div>
-				<div use:setupStaff class="staff-container"></div>
-			</div>
-		{/if}
+			<div use:setupStaff class="staff-container"></div>
+		</div>
 	{/snippet}
 	{#snippet controls()}
 		<div class="input">
@@ -95,19 +85,6 @@
 </ExerciseShell>
 
 <style>
-	.start-container {
-		display: grid;
-		place-items: center;
-		gap: var(--space-4);
-		padding: var(--space-4);
-	}
-	button.custom {
-		padding: var(--space-4) var(--space-6);
-		transition: none;
-	}
-	button.custom:active {
-		background-color: var(--color-primary);
-	}
 	.input {
 		padding: var(--space-2);
 		padding-bottom: var(--space-5);

@@ -99,7 +99,7 @@ export class SightreadingExercise {
   // UI State (variables that will be accessed outside of this class, so getters are made to ensure only instance can change these)
   private _score = $state(0);
   private currentNote: Note = { name: "C", octave: 4, accidental: null };
-  private _isGameOver = $state(false);
+  private _isGameOver = $state(true);
   private correctNotesPlayed: number = 0;
   private totalNotesPlayed: number = $state(0);
 
@@ -124,7 +124,6 @@ export class SightreadingExercise {
 
     this.currentNote = this.generateNewNote();
     this.timerComponentInstance = new TimerComponent(this.currentExerciseParam.timer, this.handleTimeout);
-    this.timerComponentInstance.start();
   }
 
   private handleDrawNoteOnStaff(note: Note) {
@@ -172,6 +171,12 @@ export class SightreadingExercise {
     // Justifies note once, as the changeNoteByIndex does not affect the X pos
     this.staffRendererInstance.drawNote(vsNoteStr);
     this.staffRendererInstance.justifyNotes();
+  }
+
+  start() {
+    if (!this.timerComponentInstance) return;
+    this.timerComponentInstance.start();
+    this._isGameOver = false;
   }
 
   handleMidiInput = (message: MidiMessage) => {

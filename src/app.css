@@ -95,6 +95,14 @@ a {
   --radius-lg: 16px;
   --radius-full: 9999px;
 
+  /* Colors for Icons */
+  --color-icon-green: #7CD953;
+  --color-icon-on-green: #3D5930;
+  --color-icon-orange: #D98F53;
+  --color-icon-on-orange: #46372B;
+  --color-icon-yellow: #EBEB5D;
+  --color-icon-on-yellow: #59592D;
+
   --color-primary-light: var(--palette-blue-400);
   --color-primary: var(--palette-blue-500);
   --color-primary-dark: var(--palette-blue-600);
@@ -268,6 +276,11 @@ button.on-background {
 
 button.on-background:hover {
   background-color: var(--color-background-dark);
+}
+
+button.large {
+  font-size: var(--font-size-20);
+  padding: var(--space-4) var(--space-6);
 }
 
 /* INPUTS */

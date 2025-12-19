@@ -1,7 +1,6 @@
 <script lang="ts">
 	import ChordGuesserExercise from '$lib/components/Exercises/ChordGuesserExercise.svelte';
 	import ExerciseInfoLayout from '$lib/components/Exercises/ExerciseInfoLayout.svelte';
-	import RhythmExercise from '$lib/components/Exercises/RhythmExercise.svelte';
 	import ToggleButtonGroup from '$lib/components/Inputs/ToggleButtonGroup.svelte';
 	import Wrapper from '$lib/components/Wrapper.svelte';
 	import { exercisesData } from '$lib/data/exercisesData';
