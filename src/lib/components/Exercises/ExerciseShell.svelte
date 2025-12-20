@@ -52,7 +52,7 @@
 			</div>
 			{#if !isStarted}
 				<div class="start-container">
-					<p class="body-large">When Ready, press Start!</p>
+					<p class="body-regular">When Ready, press Start!</p>
 					<button class="primary large icon-container" onclick={handleStart}>
 						<StartStopIcon color="var(--color-on-primary)" />
 						Start

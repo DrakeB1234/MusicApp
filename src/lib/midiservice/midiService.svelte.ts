@@ -126,7 +126,8 @@ class MidiService {
     };
   }
 
-  async refreshDevices() {
+  refreshDevices = async () => {
+    this.error = null;
     if (!this.isReady) {
       await this.init();
     }
