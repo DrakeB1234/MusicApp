@@ -1,8 +1,8 @@
 import { pianoAudioService } from "$lib/audio/pianoAudioService.svelte";
 import { sfxAudioService } from "$lib/audio/sfxAudioService.svelte";
-import { absoluteSemitoneToNote, noteToAbsoluteSemitone, noteToVectorScoreString, type Note } from "$lib/helpers/notehelpers";
+import { absoluteSemitoneToNote, noteToAbsoluteSemitone, noteToString, noteToVectorScoreString, type Note } from "$lib/helpers/notehelpers";
 import { type MidiMessage } from "$lib/midiservice/midiService.svelte";
-import { ScrollingStaff } from "vector-score";
+import type { MusicStaff } from "vector-score";
 import { TimerComponent } from "./TimerComponent.svelte";
 
 type difficulty = "easy" | "medium" | "hard";
@@ -84,26 +84,32 @@ export const exercisePresetParams: Record<difficulty, ExercisePresetConfig> = {
   },
 }
 
-const NOTES_TO_GENERATE = 30;
+const CONSECUTIVE_CORRECT_COUNT = 3;
+const CONSECUTIVE_CORRECT_TIME_BONUS = 2;
 
-export class SightReadingExercise {
-  private staffRendererInstance: ScrollingStaff | null = null;
+export class NoteRecognitionExercise {
+  private staffRendererInstance: MusicStaff | null = null;
+  private timerComponentInstance: TimerComponent | null;
 
+  private consecutiveCorrectNotes: number = 0;
   private minSemitone: number;
   private maxSemitone: number;
-  private notesQueue: Note[] = [];
-  private currentNoteIndex: number = 0;
   private currentExerciseParam: ExercisePresetConfig;
-  private currentNote: Note = { name: "C", octave: 4, accidental: null };
 
   // UI State (variables that will be accessed outside of this class, so getters are made to ensure only instance can change these)
   private _score = $state(0);
+  private currentNote: Note = { name: "C", octave: 4, accidental: null };
   private _isGameOver = $state(false);
   private correctNotesPlayed: number = 0;
   private totalNotesPlayed: number = $state(0);
 
   get score(): number { return this._score };
   get isGameOver(): boolean { return this._isGameOver };
+  get timeLeft(): string {
+    if (!this.timerComponentInstance) return "";
+    const str = this.timerComponentInstance.formatTime();
+    return str;
+  }
   get correctAndTotalNotes(): string {
     return `${this.correctNotesPlayed} / ${this.totalNotesPlayed}`;
   }
@@ -116,76 +122,61 @@ export class SightReadingExercise {
     this.minSemitone = noteToAbsoluteSemitone(this.currentExerciseParam.noteRanges[clef].min);
     this.maxSemitone = noteToAbsoluteSemitone(this.currentExerciseParam.noteRanges[clef].max);
 
-    this.generateNotesQueue(NOTES_TO_GENERATE);
-
-    // Set initial target
-    if (this.notesQueue.length > 0) {
-      this.currentNote = this.notesQueue[0];
-    }
+    this.currentNote = this.generateNewNote();
+    this.timerComponentInstance = new TimerComponent(this.currentExerciseParam.timer, this.handleTimeout);
   }
 
-  private generateNotesQueue(count: number) {
-    for (let i = 0; i < count; i++) {
-      this.notesQueue.push(this.generateRandomNote());
-    }
+  private handleDrawNoteOnStaff(note: Note) {
+    if (!this.staffRendererInstance) return;
+
+    this.staffRendererInstance.changeNoteByIndex(noteToVectorScoreString(note), 0);
   }
 
-  private generateRandomNote(): Note {
-    // Ensure we don't just repeat the exact same pitch immediately if possible (optional, but good for gameplay)
-    // For simple generation:
-    const randomSemitone = Math.floor(Math.random() * (this.maxSemitone - this.minSemitone + 1)) + this.minSemitone;
-
-    let note = absoluteSemitoneToNote(randomSemitone);
-    note.accidental = null;
-
-    if (this.currentExerciseParam.accidentalChance && Math.random() < this.currentExerciseParam.accidentalChance) {
-      if (this.currentExerciseParam.allowedAccidentals) {
-        const randomAccidentalIdx = Math.floor(Math.random() * this.currentExerciseParam.allowedAccidentals.length);
-        note.accidental = this.currentExerciseParam.allowedAccidentals[randomAccidentalIdx];
-      };
-    };
-
-    return note;
-  };
+  private handleTimeout = () => {
+    this._isGameOver = true;
+  }
 
   private handleCorrectNote(note: Note) {
     if (!note.octave) note.octave = this.currentNote.octave;
     pianoAudioService.playNote(note);
-    this.staffRendererInstance?.advanceNotes();
+
+    if (this.consecutiveCorrectNotes >= CONSECUTIVE_CORRECT_COUNT) {
+      this.timerComponentInstance?.addTime(CONSECUTIVE_CORRECT_TIME_BONUS);
+      this.consecutiveCorrectNotes = 0;
+    }
+    else {
+      this.consecutiveCorrectNotes++;
+    }
 
     this.totalNotesPlayed += 1;
     this.correctNotesPlayed += 1;
 
-    this.currentNoteIndex++;
-    if (this.currentNoteIndex >= this.notesQueue.length) {
-      this._isGameOver = true;
-    }
-    else {
-      this.currentNote = this.notesQueue[this.currentNoteIndex];
-    }
+    const newNote = this.generateNewNote();
+    this.currentNote = newNote;
+
   }
 
   private handleIncorrectNote(note: Note) {
     this.totalNotesPlayed += 1;
+    this.consecutiveCorrectNotes = 0;
 
     sfxAudioService.play("wrong");
   }
 
-  setRenderer(renderer: ScrollingStaff) {
+  setRenderer(renderer: MusicStaff) {
     if (this.staffRendererInstance) return;
     this.staffRendererInstance = renderer;
+    const vsNoteStr = noteToVectorScoreString(this.currentNote);
 
-    let vectorNoteStrings: string[] = [];
-    this.notesQueue.forEach(note => {
-      vectorNoteStrings.push(noteToVectorScoreString(note));
-    });
-
-    this.staffRendererInstance.queueNotes(vectorNoteStrings);
+    // Justifies note once, as the changeNoteByIndex does not affect the X pos
+    this.staffRendererInstance.drawNote(vsNoteStr);
+    this.staffRendererInstance.justifyNotes();
   }
 
   // Starts the game by starting the timer, input handlers and handleTimeout handle the game logic
   startGameLoop() {
-
+    if (!this.timerComponentInstance) return;
+    this.timerComponentInstance.start();
   }
 
   handleMidiInput = (message: MidiMessage) => {
@@ -200,7 +191,6 @@ export class SightReadingExercise {
 
   handleNoteInput = (note: Note) => {
     if (this._isGameOver) return;
-
     const tempCurrentNote = { ...this.currentNote };
 
     if (!note.octave) {
@@ -212,7 +202,36 @@ export class SightReadingExercise {
   }
 
   destroy() {
-    this.staffRendererInstance?.destroy();
+    if (!this.timerComponentInstance) return;
+    this.timerComponentInstance.stop();
+    this.timerComponentInstance = null;
     this.staffRendererInstance = null;
+  }
+
+  generateNewNote(): Note {
+    const lastNoteSemitone = noteToAbsoluteSemitone(this.currentNote);
+
+    const randomSemitone = Math.floor(Math.random() * (this.maxSemitone - this.minSemitone + 1)) + this.minSemitone;
+    let newSemitone = randomSemitone;
+
+    if (randomSemitone === lastNoteSemitone) {
+      newSemitone += 2;
+      if (newSemitone > this.maxSemitone) newSemitone = this.minSemitone;
+    }
+
+    let note = absoluteSemitoneToNote(newSemitone);
+    note.accidental = null;
+
+    if (this.currentExerciseParam.accidentalChance && Math.random() < this.currentExerciseParam.accidentalChance) {
+      if (this.currentExerciseParam.allowedAccidentals) {
+        const randomAccidentalIdx = Math.floor(Math.random() * this.currentExerciseParam.allowedAccidentals.length);
+        const newAccidental = this.currentExerciseParam.allowedAccidentals[randomAccidentalIdx];
+        note.accidental = newAccidental;
+      };
+    };
+
+    this.handleDrawNoteOnStaff(note);
+
+    return note;
   }
 }

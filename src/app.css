@@ -402,3 +402,8 @@ a.link {
   align-items: center;
   gap: var(--space-1);
 }
+
+/* Vector Score Styling */
+g.vs-scrolling-notes-layer>g.vs-note-wrapper {
+  transition: transform 0.2s ease-in;
+}

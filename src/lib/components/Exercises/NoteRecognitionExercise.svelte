@@ -3,18 +3,18 @@
 	import { onMount } from 'svelte';
 	import NoteInputButtons from '$lib/components/Inputs/NoteInputButtons.svelte';
 	import {
-		SightReadingExercise,
+		NoteRecognitionExercise,
 		type ExerciseParams
-	} from '$lib/exerciselogic/SightReadingExercise.svelte';
+	} from '$lib/exerciselogic/NoteRecognitionExercise.svelte';
 	import { midiService } from '$lib/midiservice/midiService.svelte';
 	import { sfxAudioService } from '$lib/audio/sfxAudioService.svelte';
 	import ExerciseShell from './ExerciseShell.svelte';
-	import { ScrollingStaff, type StaffTypes } from 'vector-score';
+	import { MusicStaff, type StaffTypes } from 'vector-score';
 
 	const { handleExitPressed, params }: { handleExitPressed: () => void; params: ExerciseParams } =
 		$props();
 
-	const game = new SightReadingExercise(params.difficulty, params.clef);
+	const game = new NoteRecognitionExercise(params.difficulty, params.clef);
 	let isStart: boolean = $state(false);
 
 	onMount(() => {
@@ -34,10 +34,9 @@
 	});
 
 	function setupStaff(node: HTMLElement) {
-		const newStaff = new ScrollingStaff(node, {
+		const newStaff = new MusicStaff(node, {
 			staffType: params.clef as StaffTypes,
-			width: 300,
-			noteStartX: 20,
+			width: 200,
 			scale: 1.4,
 			spaceAbove: 3,
 			spaceBelow: 4,
@@ -59,7 +58,8 @@
 	handleExit={handleExitPressed}
 	stats={[
 		{ value: game.score, label: 'Score' },
-		{ value: game.correctAndTotalNotes, label: 'Correct' }
+		{ value: game.correctAndTotalNotes, label: 'Correct' },
+		{ value: game.timeLeft, label: 'Time Left' }
 	]}
 	isGameOver={game.isGameOver}
 	isStarted={isStart}

@@ -41,6 +41,6 @@
 	},
 	"dependencies": {
 		"howler": "^2.2.4",
-		"vector-score": "github:DrakeB1234/VectorScore"
+		"vector-score": "^1.0.2"
 	}
 }

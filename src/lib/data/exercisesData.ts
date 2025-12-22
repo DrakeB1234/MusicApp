@@ -17,10 +17,35 @@ export const exercisesData: ExerciseDataEntry[] = [
   {
     id: "a8d49c42-e11e-446e-aa96-7137debdc937",
     color: "var(--color-primary-light)",
-    exerciseUrl: "sight-reading",
-    title: "Sightreading",
+    exerciseUrl: "note-recognition",
+    title: "Note Recognition",
     description: "Play as many correct pitches on the staff as you can! Use your midi keyboard to play, or just use the apps input.",
-    iconUrl: "icons/SightreadingIcon.svg",
+    iconUrl: "icons/NoteRecognitionIcon.svg",
+    tutorial: [
+      {
+        header: "Gameplay Mechanics",
+        text: [
+          "A note will appear on the staff on screen on start",
+          "You must press/play the correct corresponding note to earn points.",
+          "Get as many answers in 60 seconds!"
+        ]
+      },
+      {
+        header: "Scoring",
+        text: [
+          "The faster you answer, the bigger the bonus points are.",
+          "The harder difficulty options will provide more points",
+        ]
+      },
+    ]
+  },
+  {
+    id: "a6c47632-8c34-44eb-b698-6323c27d804f",
+    color: "var(--color-primary-light)",
+    exerciseUrl: "sight-reading",
+    title: "Sight Reading",
+    description: "Play as many correct pitches on the staff as you can on the scrolling staff! Use your midi keyboard to play, or just use the apps input.",
+    iconUrl: "icons/NoteRecognitionIcon.svg",
     tutorial: [
       {
         header: "Gameplay Mechanics",

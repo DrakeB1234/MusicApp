@@ -43,7 +43,7 @@
 
 <style>
 	dialog {
-		margin: auto;
+		margin: var(--space-4) auto;
 		border: none;
 		border-radius: var(--radius-sm);
 		padding: 0;

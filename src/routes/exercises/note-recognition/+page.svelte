@@ -1,13 +1,13 @@
 <script lang="ts">
 	import ExerciseInfoLayout from '$lib/components/Exercises/ExerciseInfoLayout.svelte';
+	import NoteRecognitionExercise from '../../../lib/components/Exercises/NoteRecognitionExercise.svelte';
 	import SettingsIcon from '$lib/components/Icons/SettingsIcon.svelte';
 	import ToggleButtonGroup from '$lib/components/Inputs/ToggleButtonGroup.svelte';
 	import Wrapper from '$lib/components/Wrapper.svelte';
 	import { exercisesData } from '$lib/data/exercisesData';
 	import type { ExerciseParams } from '$lib/exerciselogic/NoteRecognitionExercise.svelte';
-	import SightReadingExercise from '$lib/components/Exercises/SightReadingExercise.svelte';
 
-	const exerciseEntry = exercisesData.find((e) => e.exerciseUrl === 'sight-reading');
+	const exerciseEntry = exercisesData.find((e) => e.exerciseUrl === 'note-recognition');
 	if (!exerciseEntry) throw new Error('No exercise found.');
 	let isStart: boolean = $state(false);
 	let exerciseParams: ExerciseParams = $state({
@@ -55,6 +55,6 @@
 	</ExerciseInfoLayout>
 {:else}
 	<Wrapper>
-		<SightReadingExercise handleExitPressed={handleExitExercise} params={exerciseParams} />
+		<NoteRecognitionExercise handleExitPressed={handleExitExercise} params={exerciseParams} />
 	</Wrapper>
 {/if}
