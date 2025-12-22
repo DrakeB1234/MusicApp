@@ -21,6 +21,7 @@ export const NATURAL_NOTE_SEMITONE_OFFSETS: Record<string, number> = {
   A: 9,
   B: 11
 };
+const NATURAL_NOTE_SEMITONE_OFFSETS_VALUES = Object.values(NATURAL_NOTE_SEMITONE_OFFSETS);
 
 const REGEX_NOTE_STRING = /(?<name>[a-gA-G])(?<accidental>[#b]?)(?<octave>[0-9])/;
 
@@ -120,6 +121,17 @@ export function stringToNote(note: string): Note | null {
     accidental: accidental ?? null,
     octave: Number(octave)
   };
+};
+
+export function clampToNaturalSemitone(semitone: number): number {
+  const pitchClass = semitone % 12;
+
+  // If it's already a white key, return it.
+  if (NATURAL_NOTE_SEMITONE_OFFSETS_VALUES.includes(pitchClass)) {
+    return semitone;
+  }
+
+  return semitone - 1;
 }
 
 export function rhythmStringToVectorScoreData(notes: string[]): VectorScoreRhythmData[] {

@@ -1,6 +1,6 @@
 import { pianoAudioService } from "$lib/audio/pianoAudioService.svelte";
 import { sfxAudioService } from "$lib/audio/sfxAudioService.svelte";
-import { absoluteSemitoneToNote, noteToAbsoluteSemitone, noteToString, noteToVectorScoreString, type Note } from "$lib/helpers/notehelpers";
+import { absoluteSemitoneToNote, clampToNaturalSemitone, noteToAbsoluteSemitone, noteToString, noteToVectorScoreString, type Note } from "$lib/helpers/notehelpers";
 import { type MidiMessage } from "$lib/midiservice/midiService.svelte";
 import type { MusicStaff } from "vector-score";
 import { TimerComponent } from "./TimerComponent.svelte";
@@ -84,14 +84,10 @@ export const exercisePresetParams: Record<difficulty, ExercisePresetConfig> = {
   },
 }
 
-const CONSECUTIVE_CORRECT_COUNT = 3;
-const CONSECUTIVE_CORRECT_TIME_BONUS = 2;
-
 export class NoteRecognitionExercise {
   private staffRendererInstance: MusicStaff | null = null;
   private timerComponentInstance: TimerComponent | null;
 
-  private consecutiveCorrectNotes: number = 0;
   private minSemitone: number;
   private maxSemitone: number;
   private currentExerciseParam: ExercisePresetConfig;
@@ -140,14 +136,6 @@ export class NoteRecognitionExercise {
     if (!note.octave) note.octave = this.currentNote.octave;
     pianoAudioService.playNote(note);
 
-    if (this.consecutiveCorrectNotes >= CONSECUTIVE_CORRECT_COUNT) {
-      this.timerComponentInstance?.addTime(CONSECUTIVE_CORRECT_TIME_BONUS);
-      this.consecutiveCorrectNotes = 0;
-    }
-    else {
-      this.consecutiveCorrectNotes++;
-    }
-
     this.totalNotesPlayed += 1;
     this.correctNotesPlayed += 1;
 
@@ -158,9 +146,36 @@ export class NoteRecognitionExercise {
 
   private handleIncorrectNote(note: Note) {
     this.totalNotesPlayed += 1;
-    this.consecutiveCorrectNotes = 0;
 
     sfxAudioService.play("wrong");
+  }
+
+  private generateNewNote(): Note {
+    // Get the last note, remove the accidental, then get semitone to compare to random one, if duplicate fix.
+    let randomSemitone = Math.floor(Math.random() * (this.maxSemitone - this.minSemitone + 1)) + this.minSemitone;
+    randomSemitone = clampToNaturalSemitone(randomSemitone);
+    const prevNote = this.currentNote;
+    prevNote.accidental = null;
+    const prevSemitone = noteToAbsoluteSemitone(prevNote);
+
+    if (prevSemitone === randomSemitone) {
+      randomSemitone = Math.floor(Math.random() * (this.maxSemitone - this.minSemitone + 1)) + this.minSemitone;
+      randomSemitone = clampToNaturalSemitone(randomSemitone);
+    };
+
+    let note = absoluteSemitoneToNote(randomSemitone);
+
+    if (this.currentExerciseParam.accidentalChance && Math.random() < this.currentExerciseParam.accidentalChance) {
+      if (this.currentExerciseParam.allowedAccidentals) {
+        const randomAccidentalIdx = Math.floor(Math.random() * this.currentExerciseParam.allowedAccidentals.length);
+        const newAccidental = this.currentExerciseParam.allowedAccidentals[randomAccidentalIdx];
+        note.accidental = newAccidental;
+      };
+    };
+
+    this.handleDrawNoteOnStaff(note);
+
+    return note;
   }
 
   setRenderer(renderer: MusicStaff) {
@@ -206,32 +221,5 @@ export class NoteRecognitionExercise {
     this.timerComponentInstance.stop();
     this.timerComponentInstance = null;
     this.staffRendererInstance = null;
-  }
-
-  generateNewNote(): Note {
-    const lastNoteSemitone = noteToAbsoluteSemitone(this.currentNote);
-
-    const randomSemitone = Math.floor(Math.random() * (this.maxSemitone - this.minSemitone + 1)) + this.minSemitone;
-    let newSemitone = randomSemitone;
-
-    if (randomSemitone === lastNoteSemitone) {
-      newSemitone += 2;
-      if (newSemitone > this.maxSemitone) newSemitone = this.minSemitone;
-    }
-
-    let note = absoluteSemitoneToNote(newSemitone);
-    note.accidental = null;
-
-    if (this.currentExerciseParam.accidentalChance && Math.random() < this.currentExerciseParam.accidentalChance) {
-      if (this.currentExerciseParam.allowedAccidentals) {
-        const randomAccidentalIdx = Math.floor(Math.random() * this.currentExerciseParam.allowedAccidentals.length);
-        const newAccidental = this.currentExerciseParam.allowedAccidentals[randomAccidentalIdx];
-        note.accidental = newAccidental;
-      };
-    };
-
-    this.handleDrawNoteOnStaff(note);
-
-    return note;
   }
 }

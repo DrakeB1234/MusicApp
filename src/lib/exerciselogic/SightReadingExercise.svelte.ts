@@ -1,6 +1,6 @@
 import { pianoAudioService } from "$lib/audio/pianoAudioService.svelte";
 import { sfxAudioService } from "$lib/audio/sfxAudioService.svelte";
-import { absoluteSemitoneToNote, noteToAbsoluteSemitone, noteToVectorScoreString, type Note } from "$lib/helpers/notehelpers";
+import { absoluteSemitoneToNote, clampToNaturalSemitone, noteToAbsoluteSemitone, noteToVectorScoreString, type Note } from "$lib/helpers/notehelpers";
 import { type MidiMessage } from "$lib/midiservice/midiService.svelte";
 import { ScrollingStaff } from "vector-score";
 import { TimerComponent } from "./TimerComponent.svelte";
@@ -131,12 +131,19 @@ export class SightReadingExercise {
   }
 
   private generateRandomNote(): Note {
-    // Ensure we don't just repeat the exact same pitch immediately if possible (optional, but good for gameplay)
-    // For simple generation:
-    const randomSemitone = Math.floor(Math.random() * (this.maxSemitone - this.minSemitone + 1)) + this.minSemitone;
+    // Get the last note, remove the accidental, then get semitone to compare to random one, if duplicate fix.
+    let randomSemitone = Math.floor(Math.random() * (this.maxSemitone - this.minSemitone + 1)) + this.minSemitone;
+    randomSemitone = clampToNaturalSemitone(randomSemitone);
+    const prevNote = this.currentNote;
+    prevNote.accidental = null;
+    const prevSemitone = noteToAbsoluteSemitone(prevNote);
+
+    if (prevSemitone === randomSemitone) {
+      randomSemitone = Math.floor(Math.random() * (this.maxSemitone - this.minSemitone + 1)) + this.minSemitone;
+      randomSemitone = clampToNaturalSemitone(randomSemitone);
+    };
 
     let note = absoluteSemitoneToNote(randomSemitone);
-    note.accidental = null;
 
     if (this.currentExerciseParam.accidentalChance && Math.random() < this.currentExerciseParam.accidentalChance) {
       if (this.currentExerciseParam.allowedAccidentals) {
@@ -145,6 +152,8 @@ export class SightReadingExercise {
       };
     };
 
+    // Set this note as current, for helping duplicate notes at start of this block
+    this.currentNote = note;
     return note;
   };
 
