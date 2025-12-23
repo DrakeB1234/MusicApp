@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { MAX_BPM, MIN_BPM, sfxAudioService } from '$lib/audio/sfxAudioService.svelte';
-	import StartStopIcon from '$lib/components/Icons/StartStopIcon.svelte';
 	import Navbar from '$lib/components/Navbar.svelte';
 	import SliderInput from '$lib/components/Inputs/SliderInput.svelte';
 	import Wrapper from '$lib/components/Wrapper.svelte';
 	import { onMount } from 'svelte';
+	import Icon from '$lib/components/Icon.svelte';
 
 	onMount(() => {
 		sfxAudioService.init();
@@ -85,7 +85,10 @@
 
 			<div class="action-buttons">
 				<button class="primary icon-container" onclick={toggleMetronome}>
-					<StartStopIcon color="var(--color-on-primary)" isStart={isPlaying} />
+					<Icon
+						name={isPlaying ? 'material-stop' : 'material-start'}
+						color="var(--color-on-primary)"
+					/>
 					{#if !isPlaying}
 						Start
 					{:else}

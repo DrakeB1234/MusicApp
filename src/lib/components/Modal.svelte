@@ -1,6 +1,6 @@
 <script lang="ts">
+	import Icon from '$lib/components/Icon.svelte';
 	import { type Snippet } from 'svelte';
-	import ExitIcon from './Icons/ExitIcon.svelte';
 
 	let {
 		open = $bindable(false),
@@ -33,7 +33,7 @@
 	<div class="header-container">
 		<h2 class="body-large">{headerText}</h2>
 		<button class="text small" onclick={() => (open = false)} aria-label="close-dialog"
-			><ExitIcon /></button
+			><Icon name="material-exit" /></button
 		>
 	</div>
 	<div class="modal-content">

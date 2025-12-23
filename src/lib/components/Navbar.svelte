@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import icon from '$lib/assets/icon.svg';
-	import ExitIcon from './Icons/ExitIcon.svelte';
-	import MenuIcon from './Icons/MenuIcon.svelte';
+	import Icon from '$lib/components/Icon.svelte';
 
 	let currentLink = $state(page.url.pathname);
 	let showMobileNav = $state(false);
@@ -23,7 +22,7 @@
 		<a href="/" class="reset link">Stats</a>
 	</nav>
 	<button class="primary mobile-menu-button" onclick={toggleNav}>
-		<MenuIcon color="var(--color-on-primary)" />
+		<Icon name="material-menu" color="var(--color-on-primary)" />
 	</button>
 </div>
 
@@ -34,7 +33,7 @@
 <div class="sidebar-container" class:show={showMobileNav}>
 	<div class="mobile-header">
 		<button class="primary" onclick={toggleNav}>
-			<ExitIcon size={24} color="var(--color-on-primary)" />
+			<Icon name="material-exit" color="var(--color-on-primary)" />
 		</button>
 	</div>
 	<nav class="mobile-links">

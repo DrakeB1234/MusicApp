@@ -1,6 +1,6 @@
 <script>
+	import Icon from '$lib/components/Icon.svelte';
 	import { midiService } from '$lib/midiservice/midiService.svelte';
-	import ConnectIcon from './Icons/ConnectIcon.svelte';
 	import Modal from './Modal.svelte';
 
 	let openModal = $state(false);
@@ -8,7 +8,7 @@
 
 <button class="text icon-container" onclick={() => (openModal = true)}>
 	<span class="connect-status" class:active={midiService.isDeviceConnected}></span>
-	<ConnectIcon />
+	<Icon name="material-connect" />
 	Devices
 </button>
 

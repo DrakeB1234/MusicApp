@@ -1,10 +1,10 @@
 <script lang="ts">
 	import type { ExerciseDataEntry } from '$lib/data/exercisesData';
 	import type { Snippet } from 'svelte';
-	import LeftBackIcon from '../Icons/LeftBackIcon.svelte';
 	import CardIconWrapper from '../CardIconWrapper.svelte';
 	import Wrapper from '../Wrapper.svelte';
 	import Navbar from '../Navbar.svelte';
+	import Icon from '$lib/components/Icon.svelte';
 
 	const {
 		exerciseEntry,
@@ -30,14 +30,14 @@
 {#snippet infoCard()}
 	<div class="infoCard card">
 		<a class="button-text icon-container back-link" href="/exercises">
-			<LeftBackIcon />
+			<Icon name="material-left-arrow" />
 			All Exercises
 		</a>
 		<div class="exercise-data">
 			<CardIconWrapper
-				url={exerciseEntry.iconUrl}
-				title={exerciseEntry.title}
+				iconId={exerciseEntry.iconId}
 				backgroundColor={exerciseEntry.color}
+				onBackgroundColor={exerciseEntry.onColor}
 			/>
 			<div class="exercise-text">
 				<h1 class="body-regular">{exerciseEntry.title}</h1>
@@ -99,7 +99,7 @@
 	}
 	.exercise-data {
 		display: flex;
-		gap: var(--space-4);
+		gap: var(--space-2);
 	}
 	.stats {
 		display: flex;

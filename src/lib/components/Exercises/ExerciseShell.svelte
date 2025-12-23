@@ -1,8 +1,7 @@
 <script lang="ts">
-	import ExitIcon from '$lib/components/Icons/ExitIcon.svelte';
 	import type { Snippet } from 'svelte';
 	import MidiDeviceConnect from '../MidiDeviceConnect.svelte';
-	import StartStopIcon from '../Icons/StartStopIcon.svelte';
+	import Icon from '$lib/components/Icon.svelte';
 
 	type Stat = {
 		label: string;
@@ -32,7 +31,7 @@
 
 <main class="game">
 	<button class="text on-background icon-container" onclick={handleExit}>
-		<ExitIcon />
+		<Icon name="material-exit" />
 		Exit
 	</button>
 	<div class="card">
@@ -54,7 +53,7 @@
 				<div class="start-container">
 					<p class="body-regular">When Ready, press Start!</p>
 					<button class="primary large icon-container" onclick={handleStart}>
-						<StartStopIcon color="var(--color-on-primary)" />
+						<Icon name="material-start" color="var(--color-on-primary)" />
 						Start
 					</button>
 				</div>

@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { pianoAudioService } from '$lib/audio/pianoAudioService.svelte';
-	import StartStopIcon from '$lib/components/Icons/StartStopIcon.svelte';
 	import SelectInput from '$lib/components/Inputs/SelectInput.svelte';
 	import ToggleButtonGroup from '$lib/components/Inputs/ToggleButtonGroup.svelte';
 	import Navbar from '$lib/components/Navbar.svelte';
 	import Wrapper from '$lib/components/Wrapper.svelte';
 	import { getScaleNotes, SCALE_INTERVALS } from '$lib/helpers/chordHelpers';
 	import { NATURAL_NOTE_NAMES, noteToVectorScoreString, type Note } from '$lib/helpers/notehelpers';
+	import Icon from '$lib/components/Icon.svelte';
 	import { onDestroy, onMount } from 'svelte';
 	import { MusicStaff } from 'vector-score';
 
@@ -111,7 +111,7 @@
 					class="primary icon-container play-button"
 					onclick={handlePlayAllPressed}
 					disabled={playScaleInterval !== null}
-					><StartStopIcon color="var(--color-on-primary)" /></button
+					><Icon name="material-start" color="var(--color-on-primary)" /></button
 				>
 				<div class="button-group">
 					{#each currentScaleButtonNotes as note, i}

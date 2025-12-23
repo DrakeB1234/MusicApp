@@ -1,6 +1,6 @@
 <script lang="ts">
-	import PlayIcon from '../Icons/PlayIcon.svelte';
 	import { exercisesData } from '$lib/data/exercisesData';
+	import Icon from '$lib/components/Icon.svelte';
 	import CardIconWrapper from '../CardIconWrapper.svelte';
 
 	const { summaryVersion = false } = $props();
@@ -12,13 +12,17 @@
 	<h2 class="body-regular">Exercises</h2>
 	{#each fixedExerciseData as data (data.id)}
 		<a href="/exercises/{data.exerciseUrl}" class="reset link-card-item">
-			<CardIconWrapper url={data.iconUrl} title={data.title} backgroundColor={data.color} />
+			<CardIconWrapper
+				iconId={data.iconId}
+				backgroundColor={data.color}
+				onBackgroundColor={data.onColor}
+			/>
 			<div class="card-text">
 				<h3 class="body-regular">{data.title}</h3>
 				<p class="body-small text-light">{data.description}</p>
 			</div>
 			<div class="play-container">
-				<PlayIcon />
+				<Icon name="material-play-circle" />
 			</div>
 		</a>
 	{/each}

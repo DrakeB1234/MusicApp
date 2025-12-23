@@ -1,11 +1,11 @@
 <script lang="ts">
 	import ExerciseInfoLayout from '$lib/components/Exercises/ExerciseInfoLayout.svelte';
 	import NoteRecognitionExercise from '../../../lib/components/Exercises/NoteRecognitionExercise.svelte';
-	import SettingsIcon from '$lib/components/Icons/SettingsIcon.svelte';
 	import ToggleButtonGroup from '$lib/components/Inputs/ToggleButtonGroup.svelte';
 	import Wrapper from '$lib/components/Wrapper.svelte';
 	import { exercisesData } from '$lib/data/exercisesData';
 	import type { ExerciseParams } from '$lib/exerciselogic/NoteRecognitionExercise.svelte';
+	import Icon from '$lib/components/Icon.svelte';
 
 	const exerciseEntry = exercisesData.find((e) => e.exerciseUrl === 'note-recognition');
 	if (!exerciseEntry) throw new Error('No exercise found.');
@@ -48,7 +48,7 @@
 		{/snippet}
 		{#snippet actionButtons()}
 			<button class="secondary icon-container">
-				<SettingsIcon />
+				<Icon name="material-settings" />
 				Personalize
 			</button>
 		{/snippet}

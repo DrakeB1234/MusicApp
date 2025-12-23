@@ -3,7 +3,7 @@ export type ToolsDataEntry = {
   color: string;
   url: string;
   title: string;
-  iconUrl: string;
+  iconId: string;
 }
 
 export const toolsData: ToolsDataEntry[] = [
@@ -12,20 +12,20 @@ export const toolsData: ToolsDataEntry[] = [
     color: "#7cd953",
     url: "metronome",
     title: "Metronome",
-    iconUrl: "icons/RhythmIcon.svg",
+    iconId: "rhythm-training",
   },
   {
     id: "cb56bb8d-59b1-451b-8b98-b79547a1b162",
     color: "var(--color-primary-light)",
     url: "scales-viewer",
     title: "Scales Viewer",
-    iconUrl: "icons/ScalesIcon.svg",
+    iconId: "scales",
   },
   {
     id: "4b49951d-bb3d-4009-ba1d-4a9fbb911cfd",
     color: "var(--color-primary-light)",
     url: "digital-piano",
     title: "Digital Piano",
-    iconUrl: "icons/PianoIcon.svg",
+    iconId: "piano",
   }
 ]
