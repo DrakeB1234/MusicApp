@@ -7,6 +7,7 @@
 	style="background-color: {backgroundColor}; {borderColor && `border:3px solid ${borderColor}`};"
 >
 	<img src="/{url}" alt={title} />
+	<span class=""></span>
 </div>
 
 <style>

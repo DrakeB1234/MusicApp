@@ -45,7 +45,7 @@ export const exercisesData: ExerciseDataEntry[] = [
     exerciseUrl: "sight-reading",
     title: "Sight Reading",
     description: "Play as many correct pitches on the staff as you can on the scrolling staff! Use your midi keyboard to play, or just use the apps input.",
-    iconUrl: "icons/NoteRecognitionIcon.svg",
+    iconUrl: "icons/SightReadingIcon.svg",
     tutorial: [
       {
         header: "Gameplay Mechanics",
