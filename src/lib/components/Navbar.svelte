@@ -21,7 +21,7 @@
 		<a href="/tools" class:active={currentLink.includes('/tools')} class="reset link">Tools</a>
 		<a href="/" class="reset link">Stats</a>
 	</nav>
-	<button class="primary mobile-menu-button" onclick={toggleNav}>
+	<button class="primary small mobile-menu-button" onclick={toggleNav}>
 		<Icon name="material-menu" color="var(--color-on-primary)" />
 	</button>
 </div>
@@ -32,7 +32,7 @@
 
 <div class="sidebar-container" class:show={showMobileNav}>
 	<div class="mobile-header">
-		<button class="primary" onclick={toggleNav}>
+		<button class="primary small" onclick={toggleNav}>
 			<Icon name="material-exit" color="var(--color-on-primary)" />
 		</button>
 	</div>

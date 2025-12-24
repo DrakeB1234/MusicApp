@@ -18,7 +18,7 @@ export const exercisesData: ExerciseDataEntry[] = [
   {
     id: "a8d49c42-e11e-446e-aa96-7137debdc937",
     color: "var(--color-primary-light)",
-    onColor: "var(--color-primary-dark)",
+    onColor: "var(--color-primary-xdark)",
     exerciseUrl: "note-recognition",
     title: "Note Recognition",
     description: "Play as many correct pitches on the staff as you can! Use your midi keyboard to play, or just use the apps input.",
@@ -69,8 +69,8 @@ export const exercisesData: ExerciseDataEntry[] = [
   },
   {
     id: "3d30f957-c589-43f6-b3f4-b5f37c2feb21",
-    color: "var(--color-icon-green)",
-    onColor: "var(--color-icon-on-green)",
+    color: "var(--color-icon-orange)",
+    onColor: "var(--color-icon-on-orange)",
     exerciseUrl: "rhythm-training",
     title: "Rhythm Training",
     description: "Play the correct rhythm and play as long as you don't run out of tries!",
@@ -95,8 +95,8 @@ export const exercisesData: ExerciseDataEntry[] = [
   },
   {
     id: "09ce13ff-2545-4259-91be-d218a8473fe8",
-    color: "var(--color-icon-orange)",
-    onColor: "var(--color-icon-on-orange)",
+    color: "var(--color-icon-yellow)",
+    onColor: "var(--color-icon-on-yellow)",
     exerciseUrl: "chord-guesser",
     title: "Chord Guesser",
     description: "Play the correct chord shown on the staff. You can use your keyboard on this one!",
@@ -121,8 +121,8 @@ export const exercisesData: ExerciseDataEntry[] = [
   },
   {
     id: "373c9955-4dd8-46ef-a65b-42d4cba67725",
-    color: "var(--color-icon-yellow)",
-    onColor: "var(--color-icon-on-yellow)",
+    color: "var(--color-primary-light)",
+    onColor: "var(--color-primary-xdark)",
     exerciseUrl: "intervals-drill",
     title: "Intervals Drill",
     description: "Play the correct interval based on the two notes played. Great for learning the difference in two notes on the fly!",

@@ -106,6 +106,7 @@ a {
   --color-primary-light: var(--palette-blue-400);
   --color-primary: var(--palette-blue-500);
   --color-primary-dark: var(--palette-blue-600);
+  --color-primary-xdark: var(--palette-blue-700);
   --color-on-primary: var(--palette-white);
 
   --color-background: var(--palette-grey-50);

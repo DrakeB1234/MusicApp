@@ -24,6 +24,13 @@
 	} = $props();
 </script>
 
-<svg aria-hidden="true" fill={color} width={size} height={size} style="height: auto; width: auto;">
+<svg
+	aria-hidden="true"
+	fill={color}
+	stroke={color}
+	width={size}
+	height={size}
+	style="height: auto; width: auto;"
+>
 	<use href="/sprite.svg#{name}" />
 </svg>
