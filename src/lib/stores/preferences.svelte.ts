@@ -8,7 +8,7 @@ export interface UserPrefs {
 class PreferencesStore extends PersistedState<UserPrefs> {
   constructor() {
     // Call extended class constructor, pass in defaults in no data is in localstorage
-    super('user_prefs', { theme: 'dark', volume: 50 });
+    super('user_prefs', { theme: 'light', volume: 50 });
   }
 
   toggleTheme() {

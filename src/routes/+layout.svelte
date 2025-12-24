@@ -4,7 +4,6 @@
 
 	import favicon from '$lib/assets/favicon.svg';
 	import '../app.css';
-	import { onMount } from 'svelte';
 
 	let { children } = $props();
 
@@ -14,6 +13,21 @@
 	// 		eruda.init();
 	// 	}
 	// });
+
+	import { preferences } from '$lib/stores';
+
+	// Light/dark mode selector
+	$effect(() => {
+		const theme = preferences.value.theme;
+
+		if (theme === 'dark') {
+			document.documentElement.classList.add('dark');
+			document.documentElement.style.colorScheme = 'dark';
+		} else {
+			document.documentElement.classList.remove('dark');
+			document.documentElement.style.colorScheme = 'light';
+		}
+	});
 </script>
 
 <svelte:head>

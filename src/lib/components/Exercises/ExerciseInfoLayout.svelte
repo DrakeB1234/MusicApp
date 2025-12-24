@@ -110,7 +110,7 @@
 	.stat-entry {
 		text-align: center;
 		padding: var(--space-4);
-		background-color: var(--color-background);
+		background-color: var(--color-surface-dark);
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius-lg);
 	}

@@ -8,6 +8,8 @@
 		| 'material-menu'
 		| 'material-start'
 		| 'material-stop'
+		| 'material-sun'
+		| 'material-moon'
 		| 'note-recognition'
 		| 'sight-reading'
 		| 'rhythm-training'

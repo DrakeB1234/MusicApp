@@ -140,6 +140,25 @@ a {
   --max-width-2: 1000px;
 }
 
+:root.dark {
+  --color-background: var(--palette-grey-900);
+  --color-background-dark: var(--palette-grey-800);
+  --color-on-background: var(--palette-grey-50);
+
+  --color-surface: var(--palette-grey-800);
+  --color-surface-dark: var(--palette-grey-700);
+  --color-surface-xdark: var(--palette-grey-600);
+  --color-on-surface: var(--palette-grey-50);
+
+  --color-border: var(--palette-grey-700);
+  --color-border-primary: var(--palette-blue-400);
+
+  --elevation-shadow-1: 0 3px 6px var(--palette-grey-900);
+
+  --color-font: var(--palette-grey-50);
+  --color-font-light: var(--palette-grey-400)
+}
+
 body {
   font-family: var(--system-ui);
   background-color: var(--color-background);

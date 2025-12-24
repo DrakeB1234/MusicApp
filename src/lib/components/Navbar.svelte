@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import icon from '$lib/assets/icon.svg';
 	import Icon from '$lib/components/Icon.svelte';
+	import { preferences } from '$lib/stores';
 
 	let currentLink = $state(page.url.pathname);
 	let showMobileNav = $state(false);
@@ -20,6 +21,17 @@
 		>
 		<a href="/tools" class:active={currentLink.includes('/tools')} class="reset link">Tools</a>
 		<a href="/" class="reset link">Stats</a>
+
+		<button
+			class="primary small"
+			aria-label="theme-toggle"
+			onclick={() => preferences.toggleTheme()}
+		>
+			<Icon
+				name={preferences.value.theme === 'dark' ? 'material-moon' : 'material-sun'}
+				color="var(--color-on-primary)"
+			/>
+		</button>
 	</nav>
 	<button class="primary small mobile-menu-button" onclick={toggleNav}>
 		<Icon name="material-menu" color="var(--color-on-primary)" />
