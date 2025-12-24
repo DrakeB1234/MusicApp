@@ -22,9 +22,10 @@ export const exercisePresetParams: Record<difficulty, ExercisePresetConfig> = {
     durationBarPatterns: [['e', 'e', 'q', 'h'], ['h', 'e', 'e', 'e', 'e'], ['q', 'h', 'e', 'e'], ['q', 'q', 'q', 'q'], ['e', 'e', 'e', 'e', 'h'], ['q', 'e', 'e', 'q', 'q'], ['e', 'e', 'rq', 'q', 'q'], ['rh', 'e', 'e', 'e', 'e'], ['h', 'q', 'rq'], ['h', 'rh']],
   },
   hard: {
-    durationBarPatterns: [['q', 'q', 'q', 'q'], ['h', 'h']],
+    durationBarPatterns: [['q', 'rh', 'q'], ['rh', 's', 's', 's', 's', 'q'], ['e', 'e', 'e', 'q', 'e', 'q'], ['s', 's', 'e', 'q', 'e', 'e', 'e', 'e'], ['s', 's', 're', 'q', 'e', 'e', 're', 'e'], ['rw'], ['s', 's', 'rq', 's', 's', 'rq', 'e', 'e'], ['q', 'q', 's', 's', 'e', 'e', 'e'], ['q', 'e', 'e', 'e', 'e', 'q'], ['s', 's', 's', 's', 're', 'e', 'e', 're', 'q']],
   },
 }
+
 
 const noteValuesMap: Record<string, number> = {
   "w": 4,

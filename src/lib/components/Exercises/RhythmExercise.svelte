@@ -38,7 +38,16 @@
 
 		game.setRenderer(newStaff);
 	}
+
+	function handleKeydown(event: KeyboardEvent) {
+		if (event.code === 'Space') {
+			event.preventDefault();
+			game.handleInput();
+		}
+	}
 </script>
+
+<svelte:window onkeydown={handleKeydown} />
 
 <ExerciseShell
 	{handleStart}
@@ -62,8 +71,11 @@
 			<button
 				class="secondary large tap"
 				disabled={!game.isListeningInput}
-				onclick={game.handleInput}>TAP</button
+				onclick={game.handleInput}
 			>
+				<p class="body-regular">Tap</p>
+				<p class="body-regular">Press Space</p>
+			</button>
 		</div>
 	{/snippet}
 </ExerciseShell>

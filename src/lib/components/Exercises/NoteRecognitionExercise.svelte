@@ -38,6 +38,7 @@
 			staffType: params.clef as StaffTypes,
 			width: 200,
 			scale: 1.4,
+			noteStartX: 30,
 			spaceAbove: 3,
 			spaceBelow: 4,
 			staffColor: 'var(--color-font)',

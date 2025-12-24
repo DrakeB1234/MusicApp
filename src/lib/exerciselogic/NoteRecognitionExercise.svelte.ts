@@ -80,7 +80,7 @@ export const exercisePresetParams: Record<difficulty, ExercisePresetConfig> = {
     },
     timer: 60,
     allowedAccidentals: ["#", "b"],
-    accidentalChance: 0.20
+    accidentalChance: 0.30
   },
 }
 
@@ -185,7 +185,6 @@ export class NoteRecognitionExercise {
 
     // Justifies note once, as the changeNoteByIndex does not affect the X pos
     this.staffRendererInstance.drawNote(vsNoteStr);
-    this.staffRendererInstance.justifyNotes();
   }
 
   // Starts the game by starting the timer, input handlers and handleTimeout handle the game logic

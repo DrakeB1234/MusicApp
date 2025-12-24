@@ -19,7 +19,7 @@ type NoteRange = {
 
 export type ExercisePresetConfig = {
   noteRanges: Record<string, NoteRange>;
-  timer: number;
+  generatedNotesAmount: number;
   allowedAccidentals: string[] | null;
   accidentalChance: number | null;
 }
@@ -40,7 +40,7 @@ export const exercisePresetParams: Record<difficulty, ExercisePresetConfig> = {
         max: { name: "C", octave: 4, accidental: null },
       }
     },
-    timer: 60,
+    generatedNotesAmount: 25,
     allowedAccidentals: null,
     accidentalChance: null
   },
@@ -59,7 +59,7 @@ export const exercisePresetParams: Record<difficulty, ExercisePresetConfig> = {
         max: { name: "C", octave: 4, accidental: null },
       }
     },
-    timer: 60,
+    generatedNotesAmount: 35,
     allowedAccidentals: ["#"],
     accidentalChance: 0.20
   },
@@ -78,13 +78,11 @@ export const exercisePresetParams: Record<difficulty, ExercisePresetConfig> = {
         max: { name: "E", octave: 4, accidental: null },
       }
     },
-    timer: 60,
+    generatedNotesAmount: 40,
     allowedAccidentals: ["#", "b"],
-    accidentalChance: 0.20
+    accidentalChance: 0.30
   },
 }
-
-const NOTES_TO_GENERATE = 30;
 
 export class SightReadingExercise {
   private staffRendererInstance: ScrollingStaff | null = null;
@@ -116,7 +114,7 @@ export class SightReadingExercise {
     this.minSemitone = noteToAbsoluteSemitone(this.currentExerciseParam.noteRanges[clef].min);
     this.maxSemitone = noteToAbsoluteSemitone(this.currentExerciseParam.noteRanges[clef].max);
 
-    this.generateNotesQueue(NOTES_TO_GENERATE);
+    this.generateNotesQueue(this.currentExerciseParam.generatedNotesAmount);
 
     // Set initial target
     if (this.notesQueue.length > 0) {
@@ -134,9 +132,10 @@ export class SightReadingExercise {
     // Get the last note, remove the accidental, then get semitone to compare to random one, if duplicate fix.
     let randomSemitone = Math.floor(Math.random() * (this.maxSemitone - this.minSemitone + 1)) + this.minSemitone;
     randomSemitone = clampToNaturalSemitone(randomSemitone);
-    const prevNote = this.currentNote;
-    prevNote.accidental = null;
-    const prevSemitone = noteToAbsoluteSemitone(prevNote);
+    const prevSemitone = noteToAbsoluteSemitone({
+      ...this.currentNote,
+      accidental: null
+    });
 
     if (prevSemitone === randomSemitone) {
       randomSemitone = Math.floor(Math.random() * (this.maxSemitone - this.minSemitone + 1)) + this.minSemitone;
